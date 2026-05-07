@@ -1,19 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { galleryImages, galleryCategories } from "@/data/gallery";
 import { X } from "lucide-react";
+import { useGallery } from "@/hooks/use-site-data";
+import type { GalleryImageData } from "@/hooks/use-site-data";
+
+const galleryCategories = [
+  "All",
+  "Sunset Cruises",
+  "Family Lake Days",
+  "Fishing Trips",
+  "Celebrations",
+  "Fall Colors",
+  "Pontoon Boat",
+];
 
 export function GalleryGrid() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { images: dbImages, loading } = useGallery(
+    activeCategory === "All" ? undefined : activeCategory
+  );
 
-  const filteredImages =
-    activeCategory === "All"
-      ? galleryImages
-      : galleryImages.filter((img) => img.category === activeCategory);
+  // Fallback to static data if database is empty and not loading
+  const [staticImages] = useState<GalleryImageData[]>([]);
+  const images = dbImages.length > 0 ? dbImages : staticImages;
 
   return (
     <section id="gallery" className="py-20 sm:py-28 bg-white">
@@ -58,35 +71,46 @@ export function GalleryGrid() {
         </div>
 
         {/* Image Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredImages.map((img) => (
-              <motion.div
-                key={img.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-                className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[4/3]"
-                onClick={() => setSelectedImage(img.src)}
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                  style={{ backgroundImage: `url(${img.src})` }}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                  <span className="text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-2 text-center">
-                    {img.alt}
-                  </span>
-                </div>
-              </motion.div>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[4/3] rounded-xl bg-gray-100 animate-pulse"
+              />
             ))}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+        ) : (
+          <motion.div
+            layout
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
+            <AnimatePresence mode="popLayout">
+              {images.map((img) => (
+                <motion.div
+                  key={img.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[4/3]"
+                  onClick={() => setSelectedImage(img.imageUrl)}
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                    style={{ backgroundImage: `url(${img.imageUrl})` }}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                    <span className="text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-2 text-center">
+                      {img.altText}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
         {/* Lightbox */}
         <AnimatePresence>

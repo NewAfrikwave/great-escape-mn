@@ -19,8 +19,10 @@ import {
   Loader2,
 } from "lucide-react";
 import { serviceAreaSummary } from "@/data/lakes";
+import { useBusinessInfo } from "@/hooks/use-site-data";
 
 export function ContactSection() {
+  const { info } = useBusinessInfo();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -96,10 +98,10 @@ export function ContactSection() {
                 <div>
                   <h3 className="font-semibold text-white mb-1">Email</h3>
                   <a
-                    href="mailto:greatescapemn@gmail.com"
+                    href={`mailto:${info?.email || "greatescapemn@gmail.com"}`}
                     className="text-white/60 hover:text-[#e8c878] transition-colors"
                   >
-                    greatescapemn@gmail.com
+                    {info?.email || "greatescapemn@gmail.com"}
                   </a>
                 </div>
               </div>
@@ -111,10 +113,10 @@ export function ContactSection() {
                 <div>
                   <h3 className="font-semibold text-white mb-1">Phone</h3>
                   <a
-                    href="tel:6513324859"
+                    href={`tel:${(info?.phone || "651-332-4859").replace(/[^0-9]/g, "")}`}
                     className="text-white/60 hover:text-[#e8c878] transition-colors"
                   >
-                    651-332-4859
+                    {info?.phone || "651-332-4859"}
                   </a>
                 </div>
               </div>
@@ -125,7 +127,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Service Area</h3>
-                  <p className="text-white/60">{serviceAreaSummary}</p>
+                  <p className="text-white/60">{info?.serviceAreaDescription || serviceAreaSummary}</p>
                 </div>
               </div>
             </div>

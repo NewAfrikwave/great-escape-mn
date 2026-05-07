@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Anchor } from "lucide-react";
-import { lakes } from "@/data/lakes";
+import { useLakes, useBusinessInfo } from "@/hooks/use-site-data";
 
 const quickLinks = [
   { label: "Home", href: "#home" },
@@ -15,6 +16,16 @@ const quickLinks = [
 ];
 
 export function Footer() {
+  const { lakes } = useLakes();
+  const { info } = useBusinessInfo();
+
+  const businessName = info?.businessName || "Great Escape MN";
+  const email = info?.email || "greatescapemn@gmail.com";
+  const phone = info?.phone || "651-332-4859";
+  const serviceArea = info?.serviceAreaDescription || "Minnesota lakes including Prior Lake, Marion Lake, Lakeville, Lake Minnetonka, and nearby areas by request.";
+  const footerDesc = info?.footerDescription || "Private captain-led pontoon experiences on Minnesota's most beautiful lakes.";
+  const copyright = info?.copyrightText || "Great Escape MN. All rights reserved.";
+
   return (
     <footer className="bg-[#0f1a2e] text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -27,15 +38,14 @@ export function Footer() {
             >
               <Anchor className="h-6 w-6 text-[#c8993e]" />
               <div>
-                <span className="text-lg font-bold">Great Escape MN</span>
+                <span className="text-lg font-bold">{businessName}</span>
               </div>
             </Link>
             <p className="text-sm text-white/40 leading-relaxed mb-2">
-              Three Rivers Taxi District Minnesota
+              {info?.brandSubtitle || "Private Lake Cruises & Pontoon Experiences"}
             </p>
             <p className="text-sm text-white/50 leading-relaxed">
-              Private captain-led pontoon experiences on Minnesota&apos;s most
-              beautiful lakes.
+              {footerDesc}
             </p>
           </div>
 
@@ -69,11 +79,13 @@ export function Footer() {
                   <span className="text-sm text-white/50">{lake.name}</span>
                 </li>
               ))}
-              <li>
-                <span className="text-sm text-white/40 italic">
-                  & other lakes by request
-                </span>
-              </li>
+              {lakes.length === 0 && (
+                <>
+                  <li><span className="text-sm text-white/50">Prior Lake</span></li>
+                  <li><span className="text-sm text-white/50">Lake Minnetonka</span></li>
+                  <li><span className="text-sm text-white/40 italic">& other lakes by request</span></li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -85,18 +97,18 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="mailto:greatescapemn@gmail.com"
+                  href={`mailto:${email}`}
                   className="text-sm text-white/50 hover:text-[#e8c878] transition-colors"
                 >
-                  greatescapemn@gmail.com
+                  {email}
                 </a>
               </li>
               <li>
                 <a
-                  href="tel:6513324859"
+                  href={`tel:${phone.replace(/[^0-9]/g, "")}`}
                   className="text-sm text-white/50 hover:text-[#e8c878] transition-colors"
                 >
-                  651-332-4859
+                  {phone}
                 </a>
               </li>
               <li>
@@ -111,8 +123,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/30">
-            &copy; {new Date().getFullYear()} Great Escape MN. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} {copyright}
           </p>
           <p className="text-xs text-white/30 text-center sm:text-right max-w-lg">
             All bookings are subject to weather, lake rules, availability, and

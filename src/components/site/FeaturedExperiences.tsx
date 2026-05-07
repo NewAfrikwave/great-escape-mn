@@ -17,7 +17,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react";
-import { featuredExperiences } from "@/data/packages";
+import { usePackages } from "@/hooks/use-site-data";
 
 const iconMap: Record<string, React.ElementType> = {
   sunset: Sunset,
@@ -32,9 +32,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.1 },
   },
 };
 
@@ -44,6 +42,9 @@ const cardVariants = {
 };
 
 export function FeaturedExperiences() {
+  const { packages, loading } = usePackages();
+  const featured = packages.filter((p) => p.showOnHomepage);
+
   return (
     <section id="experiences" className="py-20 sm:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,52 +75,40 @@ export function FeaturedExperiences() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {featuredExperiences.map((exp) => {
-            const Icon = iconMap[exp.slug.replace(/-/g, "")] || Compass;
-            // Map slugs to icons properly
-            const iconKey =
-              exp.slug === "sunset-cruise"
-                ? "sunset"
-                : exp.slug === "family-fun-day"
-                ? "users"
-                : exp.slug === "fishing-trip"
-                ? "fish"
-                : exp.slug === "bachelorette-cruise"
-                ? "sparkles"
-                : exp.slug === "fall-colors-tour"
-                ? "leaf"
-                : "compass";
-            const ActualIcon = iconMap[iconKey] || Compass;
+          {(loading ? [] : featured).map((pkg) => {
+            const Icon = iconMap[pkg.icon] || Compass;
 
             return (
-              <motion.div key={exp.id} variants={cardVariants}>
+              <motion.div key={pkg.id} variants={cardVariants}>
                 <Card className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white rounded-2xl">
                   <div className="relative h-52 overflow-hidden">
                     <div
                       className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                      style={{ backgroundImage: `url(${exp.image})` }}
+                      style={{
+                        backgroundImage: `url(${pkg.imageUrl || "/images/custom-cruise.png"})`,
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-[#1a2744]">
                       <Clock className="h-3 w-3" />
-                      {exp.duration}
+                      {pkg.duration}
                     </div>
                     <div className="absolute top-3 right-3 bg-[#c8993e] text-white rounded-full p-2">
-                      <ActualIcon className="h-4 w-4" />
+                      <Icon className="h-4 w-4" />
                     </div>
                   </div>
                   <CardContent className="p-5">
                     <h3 className="text-lg font-bold text-[#1a2744] mb-2">
-                      {exp.title}
+                      {pkg.title}
                     </h3>
                     <p className="text-sm text-[#2a3d64]/60 mb-4 line-clamp-2">
-                      {exp.description}
+                      {pkg.shortDescription}
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-semibold text-[#c8993e]">
-                        {exp.price}
+                        {pkg.startingPrice || "Request pricing"}
                       </span>
-                      <Link href={`#booking?package=${exp.slug}`}>
+                      <Link href={`#booking?package=${pkg.slug}`}>
                         <Button
                           variant="ghost"
                           size="sm"

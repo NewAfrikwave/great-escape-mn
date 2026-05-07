@@ -7,26 +7,186 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AdminUser {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Booking {
-  id              String   @id @default(cuid())
-  fullName        String
-  email           String
-  phone           String
-  packageSlug     String
-  preferredLake   String?
-  preferredDate   String?
-  preferredTime   String?
-  passengers      Int?
-  occasion        String?
-  fishingGear     Boolean  @default(false)
-  tubing          Boolean  @default(false)
-  byob            Boolean  @default(false)
-  decorations     Boolean  @default(false)
-  needHelpPlanning Boolean @default(false)
-  message         String?
-  status          String   @default("pending")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(cuid())
+  fullName         String
+  email            String
+  phone            String
+  packageSlug      String?
+  preferredLake    String?
+  preferredDate    String?
+  preferredTime    String?
+  passengers       Int?
+  occasion         String?
+  fishingGear      Boolean  @default(false)
+  tubing           Boolean  @default(false)
+  byob             Boolean  @default(false)
+  decorations      Boolean  @default(false)
+  needHelpPlanning Boolean  @default(false)
+  message          String?
+  status           String   @default("new")
+  adminNotes       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Package {
+  id                     String   @id @default(cuid())
+  title                  String
+  slug                   String   @unique
+  shortDescription       String
+  fullDescription        String
+  duration               String
+  capacity               String
+  startingPrice          String?
+  priceLabel             String?
+  priceType              String   @default("starting_at")
+  isPriceVisible         Boolean  @default(true)
+  isFeatured             Boolean  @default(false)
+  isActive               Boolean  @default(true)
+  showOnHomepage         Boolean  @default(true)
+  showOnExperiencesPage  Boolean  @default(true)
+  imageUrl               String?
+  icon                   String   @default("compass")
+  ctaLabel               String
+  sortOrder              Int      @default(0)
+  includedItems          String   @default("[]")
+  highlights             String   @default("[]")
+  optionalAddOns         String   @default("[]")
+  seoTitle               String?
+  seoDescription         String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model PageContent {
+  id        String   @id @default(cuid())
+  pageKey   String   @unique
+  title     String?
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HomepageSection {
+  id         String   @id @default(cuid())
+  sectionKey String   @unique
+  title      String
+  subtitle   String?
+  isEnabled  Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  content    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model GalleryImage {
+  id         String   @id @default(cuid())
+  title      String
+  altText    String
+  caption    String?
+  imageUrl   String
+  category   String
+  isFeatured Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Testimonial {
+  id                     String   @id @default(cuid())
+  customerName           String
+  customerTitleOrLocation String?
+  rating                 Int      @default(5)
+  quote                  String
+  experienceType         String?
+  isFeatured             Boolean  @default(false)
+  isActive               Boolean  @default(true)
+  sortOrder              Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String   @default("General")
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BusinessInfo {
+  id                     String   @id @default(cuid())
+  businessName           String   @default("Great Escape MN")
+  brandSubtitle          String   @default("Private Lake Cruises & Pontoon Experiences")
+  email                  String   @default("greatescapemn@gmail.com")
+  phone                  String   @default("651-332-4859")
+  alternatePhone         String?
+  address                String?
+  serviceAreaDescription String   @default("Minnesota lakes including Prior Lake, Marion Lake, Lakeville, Lake Minnetonka, and nearby areas by request.")
+  facebookUrl            String?
+  instagramUrl           String?
+  tiktokUrl              String?
+  youtubeUrl             String?
+  googleBusinessUrl      String?
+  footerDescription      String?
+  copyrightText          String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Lake {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  shortDescription String?
+  locationNotes    String?
+  region           String?
+  imageUrl         String?
+  isFeatured       Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model SeoSetting {
+  id            String   @id @default(cuid())
+  pageKey       String   @unique
+  seoTitle      String?
+  seoDescription String?
+  ogTitle       String?
+  ogDescription String?
+  ogImage       String?
+  keywords      String?
+  canonicalUrl  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ContactMessage {

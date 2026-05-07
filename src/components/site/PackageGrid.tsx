@@ -20,7 +20,7 @@ import {
   Check,
   ArrowRight,
 } from "lucide-react";
-import { packages } from "@/data/packages";
+import { usePackages } from "@/hooks/use-site-data";
 
 const iconMap: Record<string, React.ElementType> = {
   sunset: Sunset,
@@ -45,6 +45,9 @@ const cardVariants = {
 };
 
 export function PackageGrid() {
+  const { packages, loading } = usePackages();
+  const visible = packages.filter((p) => p.showOnExperiencesPage);
+
   return (
     <section className="py-20 sm:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,17 +78,24 @@ export function PackageGrid() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
         >
-          {packages.map((pkg) => {
+          {(loading ? [] : visible).map((pkg) => {
             const Icon = iconMap[pkg.icon] || Compass;
+            let includedItems: string[] = [];
+            try {
+              includedItems = JSON.parse(pkg.includedItems || "[]");
+            } catch {
+              // keep empty
+            }
 
             return (
               <motion.div key={pkg.id} variants={cardVariants}>
                 <Card className="h-full flex flex-col overflow-hidden border border-[#1a2744]/5 shadow-md hover:shadow-xl transition-all duration-300 bg-white rounded-2xl group">
-                  {/* Image Header */}
                   <div className="relative h-56 overflow-hidden">
                     <div
                       className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                      style={{ backgroundImage: `url(${pkg.image})` }}
+                      style={{
+                        backgroundImage: `url(${pkg.imageUrl || "/images/custom-cruise.png"})`,
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1a2744]/70 via-[#1a2744]/20 to-transparent" />
                     <div className="absolute top-4 left-4">
@@ -112,11 +122,10 @@ export function PackageGrid() {
 
                   <CardContent className="p-6 flex-1">
                     <p className="text-sm text-[#2a3d64]/60 mb-4 leading-relaxed">
-                      {pkg.description}
+                      {pkg.shortDescription}
                     </p>
-
                     <div className="space-y-2 mb-4">
-                      {pkg.includes.map((item) => (
+                      {includedItems.map((item: string) => (
                         <div
                           key={item}
                           className="flex items-start gap-2 text-sm"
@@ -133,11 +142,11 @@ export function PackageGrid() {
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <span className="text-lg font-bold text-[#c8993e]">
-                            {pkg.price}
+                            {pkg.startingPrice || "Request pricing"}
                           </span>
-                          {pkg.priceNote && (
+                          {pkg.priceLabel && (
                             <span className="text-xs text-[#2a3d64]/40 ml-1.5">
-                              / {pkg.priceNote}
+                              / {pkg.priceLabel}
                             </span>
                           )}
                         </div>
@@ -150,7 +159,7 @@ export function PackageGrid() {
                       </div>
                       <Link href={`#booking?package=${pkg.slug}`}>
                         <Button className="w-full bg-[#1a2744] hover:bg-[#2a3d64] text-white font-semibold gap-2 shadow-lg transition-all hover:shadow-xl">
-                          {pkg.cta}
+                          {pkg.ctaLabel}
                           <ArrowRight className="h-4 w-4" />
                         </Button>
                       </Link>

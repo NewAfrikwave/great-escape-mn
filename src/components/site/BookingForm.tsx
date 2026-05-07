@@ -23,8 +23,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Send, CheckCircle2, Loader2 } from "lucide-react";
-import { packages } from "@/data/packages";
-import { lakes } from "@/data/lakes";
+import { usePackages } from "@/hooks/use-site-data";
+import { useLakes } from "@/hooks/use-site-data";
 
 const occasions = [
   "Date Night",
@@ -39,6 +39,8 @@ const occasions = [
 
 export function BookingForm() {
   const searchParams = useSearchParams();
+  const { packages } = usePackages();
+  const { lakes } = useLakes();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
