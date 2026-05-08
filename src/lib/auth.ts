@@ -3,8 +3,16 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { db } from "./db";
 
+const authSecret = process.env.AUTH_SECRET;
+if (!authSecret && process.env.NODE_ENV === "production") {
+  console.error(
+    "⚠️  FATAL: AUTH_SECRET environment variable is not set. " +
+    "Set it in your Railway environment variables. " +
+    "Generate one with: openssl rand -base64 32"
+  );
+}
 const secret = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "fallback-secret-key"
+  authSecret || "fallback-secret-key-for-development-only"
 );
 
 export interface AdminSession {
