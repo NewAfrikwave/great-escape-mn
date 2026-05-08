@@ -25,11 +25,14 @@ import {
   Menu,
   LogOut,
   ChevronLeft,
+  CreditCard,
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+  { label: "Payments", href: "/admin/payments", icon: CreditCard },
+  { label: "Payment Settings", href: "/admin/payment-settings", icon: CreditCard },
   { label: "Packages", href: "/admin/packages", icon: Package },
   { label: "Content", href: "/admin/content", icon: FileText },
   { label: "Homepage", href: "/admin/homepage", icon: Home },

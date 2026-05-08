@@ -222,6 +222,33 @@ export function usePageContent() {
   return { content, loading };
 }
 
+interface PaymentSettingsData {
+  stripeEnabled: boolean;
+  paypalEnabled: boolean;
+  stripePublishableKey: string | null;
+  paypalClientId: string | null;
+  currency: string;
+  depositType: string;
+  depositValue: string;
+  requireDeposit: boolean;
+  allowFullPayment: boolean;
+  paymentDescription: string;
+}
+
+export function usePaymentSettings() {
+  const [settings, setSettings] = useState<PaymentSettingsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchApi<PaymentSettingsData>("/api/public/payment-settings").then((data) => {
+      if (data) setSettings(data);
+      setLoading(false);
+    });
+  }, []);
+
+  return { paymentSettings: settings, loading };
+}
+
 export type {
   PackageData,
   LakeData,
@@ -231,4 +258,5 @@ export type {
   BusinessInfoData,
   SiteSettings,
   PageContentData,
+  PaymentSettingsData,
 };

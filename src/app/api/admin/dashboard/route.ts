@@ -51,6 +51,16 @@ export async function GET(request: Request) {
       take: 5,
     });
 
+    // Payment stats
+    const [totalRevenue, totalPayments, pendingPayments] = await Promise.all([
+      db.payment.aggregate({
+        where: { status: "completed" },
+        _sum: { amount: true },
+      }),
+      db.payment.count({ where: { status: "completed" } }),
+      db.payment.count({ where: { status: "pending" } }),
+    ]);
+
     return NextResponse.json({
       stats: {
         totalBookings,
@@ -64,6 +74,9 @@ export async function GET(request: Request) {
         totalGalleryImages,
         totalTestimonials,
         unreadContactMessages,
+        totalRevenue: totalRevenue._sum.amount || 0,
+        totalPayments,
+        pendingPayments,
       },
       recentBookings,
       upcomingBookings,

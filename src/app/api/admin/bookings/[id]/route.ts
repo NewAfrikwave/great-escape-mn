@@ -47,10 +47,12 @@ export async function PATCH(
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    // Only allow updating status and adminNotes
-    const data: { status?: string; adminNotes?: string } = {};
+    // Only allow updating status, adminNotes, quotedPrice, and paymentStatus
+    const data: { status?: string; adminNotes?: string; quotedPrice?: number | null; paymentStatus?: string } = {};
     if (body.status !== undefined) data.status = body.status;
     if (body.adminNotes !== undefined) data.adminNotes = body.adminNotes;
+    if (body.quotedPrice !== undefined) data.quotedPrice = body.quotedPrice;
+    if (body.paymentStatus !== undefined) data.paymentStatus = body.paymentStatus;
 
     const booking = await db.booking.update({
       where: { id },

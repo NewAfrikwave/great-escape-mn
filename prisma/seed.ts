@@ -365,6 +365,47 @@ async function main() {
   }
   console.log("✅ Site settings seeded:", settingsData.length);
 
+  // 12. Seed Payment Settings
+  await prisma.paymentSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      stripeEnabled: false,
+      stripeTestMode: true,
+      paypalEnabled: false,
+      paypalTestMode: true,
+      currency: "USD",
+      depositType: "percentage",
+      depositValue: "50",
+      requireDeposit: true,
+      allowFullPayment: true,
+      paymentDescription: "Great Escape MN - Lake Experience",
+      receiptNote: "Thank you for booking with Great Escape MN! All bookings are subject to weather, availability, lake rules, and safety requirements.",
+    },
+  });
+  console.log("✅ Payment settings seeded");
+
+  // 13. Update some bookings with quoted prices for demo
+  const bookings = await prisma.booking.findMany({ take: 3 });
+  const demoPrices = [15000, 25000, 50000]; // $150, $250, $500 in cents
+  for (let i = 0; i < Math.min(bookings.length, demoPrices.length); i++) {
+    await prisma.booking.update({
+      where: { id: bookings[i].id },
+      data: { quotedPrice: demoPrices[i] },
+    });
+  }
+  console.log("✅ Demo booking prices set");
+
+  // 14. Update the "Do we pay online?" FAQ
+  await prisma.fAQ.updateMany({
+    where: { question: "Do we pay online?" },
+    data: {
+      answer: "Yes! We accept online payments via Stripe and PayPal. After submitting your booking request, you can pay a deposit or the full amount securely online. You'll receive a payment link once your booking is confirmed.",
+    },
+  });
+  console.log("✅ Payment FAQ updated");
+
   console.log("\n🎉 Database seeding complete!");
   console.log("📋 Admin login: " + adminEmail);
   console.log("🔑 Admin password: " + adminPassword);

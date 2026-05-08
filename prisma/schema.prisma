@@ -18,29 +18,6 @@ model AdminUser {
   updatedAt    DateTime @updatedAt
 }
 
-model Booking {
-  id               String   @id @default(cuid())
-  fullName         String
-  email            String
-  phone            String
-  packageSlug      String?
-  preferredLake    String?
-  preferredDate    String?
-  preferredTime    String?
-  passengers       Int?
-  occasion         String?
-  fishingGear      Boolean  @default(false)
-  tubing           Boolean  @default(false)
-  byob             Boolean  @default(false)
-  decorations      Boolean  @default(false)
-  needHelpPlanning Boolean  @default(false)
-  message          String?
-  status           String   @default("new")
-  adminNotes       String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-}
-
 model Package {
   id                     String   @id @default(cuid())
   title                  String
@@ -198,4 +175,87 @@ model ContactMessage {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PaymentSettings {
+  id                      String   @id @default("default")
+  stripeEnabled           Boolean  @default(false)
+  stripeTestMode          Boolean  @default(true)
+  stripePublishableKey    String?
+  stripeSecretKey         String?
+  stripeTestPublishableKey String?
+  stripeTestSecretKey     String?
+  stripeWebhookSecret     String?
+  stripeTestWebhookSecret String?
+  paypalEnabled           Boolean  @default(false)
+  paypalTestMode          Boolean  @default(true)
+  paypalClientId          String?
+  paypalClientSecret      String?
+  paypalTestClientId      String?
+  paypalTestClientSecret  String?
+  paypalWebhookId         String?
+  paypalTestWebhookId     String?
+  currency                String   @default("USD")
+  depositType             String   @default("percentage") // "percentage" or "fixed"
+  depositValue            String   @default("50") // 50% or $50
+  requireDeposit          Boolean  @default(true)
+  allowFullPayment        Boolean  @default(true)
+  paymentDescription      String   @default("Great Escape MN - Lake Experience")
+  receiptNote             String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Payment {
+  id               String   @id @default(cuid())
+  bookingId        String
+  amount           Int      // Amount in cents
+  currency         String   @default("USD")
+  status           String   @default("pending") // pending, processing, completed, failed, refunded, partially_refunded, cancelled
+  gateway          String   // "stripe" or "paypal"
+  gatewayPaymentId String?  // Stripe PaymentIntent ID or PayPal Order ID
+  gatewayChargeId  String?  // Stripe Charge ID or PayPal Capture ID
+  gatewayRefundId  String?  // Refund ID from gateway
+  paymentType      String   @default("deposit") // "deposit" or "full"
+  refundAmount     Int      @default(0) // Refund amount in cents
+  refundReason     String?
+  metadata         String   @default("{}") // JSON string for additional data
+  customerEmail    String?
+  customerName     String?
+  description      String?
+  receiptUrl       String?
+  failureReason    String?
+  paidAt           DateTime?
+  refundedAt       DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  booking          Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id               String   @id @default(cuid())
+  fullName         String
+  email            String
+  phone            String
+  packageSlug      String?
+  preferredLake    String?
+  preferredDate    String?
+  preferredTime    String?
+  passengers       Int?
+  occasion         String?
+  fishingGear      Boolean  @default(false)
+  tubing           Boolean  @default(false)
+  byob             Boolean  @default(false)
+  decorations      Boolean  @default(false)
+  needHelpPlanning Boolean  @default(false)
+  message          String?
+  status           String   @default("new")
+  adminNotes       String?
+  quotedPrice      Int?     // Quoted price in cents (set by admin)
+  paymentStatus    String   @default("unpaid") // unpaid, deposit_paid, paid, partially_refunded, refunded
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  payments         Payment[]
 }

@@ -22,8 +22,16 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Send, CheckCircle2, Loader2 } from "lucide-react";
-import { usePackages } from "@/hooks/use-site-data";
+import { Separator } from "@/components/ui/separator";
+import {
+  Send,
+  CheckCircle2,
+  Loader2,
+  CreditCard,
+  Shield,
+  Info,
+} from "lucide-react";
+import { usePackages, usePaymentSettings } from "@/hooks/use-site-data";
 import { useLakes } from "@/hooks/use-site-data";
 
 const occasions = [
@@ -41,8 +49,11 @@ export function BookingForm() {
   const searchParams = useSearchParams();
   const { packages } = usePackages();
   const { lakes } = useLakes();
+  const { paymentSettings } = usePaymentSettings();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [bookingId, setBookingId] = useState<string | null>(null);
+  const [paying, setPaying] = useState<"stripe" | "paypal" | null>(null);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -65,6 +76,10 @@ export function BookingForm() {
     const pkg = searchParams.get("package");
     if (pkg) {
       setForm((prev) => ({ ...prev, packageSlug: pkg }));
+    }
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      setSubmitted(true);
     }
   }, [searchParams]);
 
@@ -93,6 +108,8 @@ export function BookingForm() {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        setBookingId(data.bookingId || data.id || null);
         setSubmitted(true);
       }
     } catch {
@@ -101,6 +118,44 @@ export function BookingForm() {
       setLoading(false);
     }
   };
+
+  const handlePayment = async (gateway: "stripe" | "paypal", paymentType: "deposit" | "full") => {
+    if (!bookingId) return;
+    setPaying(gateway);
+
+    try {
+      const res = await fetch("/api/payments/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId, paymentType, gateway }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // If payment fails (e.g., no quoted price), show a friendly message
+        alert(data.error || "Payment is not available yet. We'll send you a payment link after confirming your booking.");
+        setPaying(null);
+        return;
+      }
+
+      if (gateway === "stripe" && data.sessionId) {
+        // Redirect to Stripe Checkout
+        const stripeUrl = new URL("/api/payments/stripe-redirect", window.location.origin);
+        stripeUrl.searchParams.set("session_id", data.sessionId);
+        window.location.href = stripeUrl.toString();
+      } else if (gateway === "paypal" && data.approvalUrl) {
+        // Redirect to PayPal
+        window.location.href = data.approvalUrl;
+      }
+    } catch {
+      alert("Something went wrong. Please try again later.");
+    } finally {
+      setPaying(null);
+    }
+  };
+
+  const hasPaymentEnabled = paymentSettings?.stripeEnabled || paymentSettings?.paypalEnabled;
 
   if (submitted) {
     return (
@@ -118,11 +173,86 @@ export function BookingForm() {
             <h3 className="text-2xl font-bold text-[#1a2744] mb-4">
               Thank You!
             </h3>
-            <p className="text-[#2a3d64]/60 leading-relaxed">
+            <p className="text-[#2a3d64]/60 leading-relaxed mb-6">
               Your booking request has been received. Great Escape MN will
               contact you shortly to confirm availability, final pricing, and
               details.
             </p>
+
+            {hasPaymentEnabled && (
+              <>
+                <Separator className="my-6" />
+                <div className="bg-[#1a2744]/5 rounded-xl p-6 text-left">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CreditCard className="h-5 w-5 text-[#1a2744]" />
+                    <h4 className="font-semibold text-[#1a2744]">Payment Options</h4>
+                  </div>
+                  <p className="text-sm text-[#2a3d64]/70 mb-4">
+                    Once we confirm your booking and set the final price, you&apos;ll receive a payment link via email. You can also try paying now if a price has been quoted.
+                  </p>
+
+                  <div className="space-y-3">
+                    {paymentSettings?.stripeEnabled && (
+                      <Button
+                        onClick={() => handlePayment("stripe", paymentSettings.requireDeposit ? "deposit" : "full")}
+                        disabled={paying !== null}
+                        className="w-full bg-[#635BFF] hover:bg-[#5248e0] text-white gap-2"
+                        size="lg"
+                      >
+                        {paying === "stripe" ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <CreditCard className="h-5 w-5" />
+                        )}
+                        Pay with Stripe
+                        {paymentSettings.requireDeposit && paymentSettings.depositValue && (
+                          <span className="text-xs opacity-80 ml-1">
+                            ({paymentSettings.depositType === "percentage" ? `${paymentSettings.depositValue}% deposit` : `$${paymentSettings.depositValue} deposit`})
+                          </span>
+                        )}
+                      </Button>
+                    )}
+                    {paymentSettings?.paypalEnabled && (
+                      <Button
+                        onClick={() => handlePayment("paypal", paymentSettings.requireDeposit ? "deposit" : "full")}
+                        disabled={paying !== null}
+                        className="w-full bg-[#0070BA] hover:bg-[#005ea6] text-white gap-2"
+                        size="lg"
+                      >
+                        {paying === "paypal" ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <CreditCard className="h-5 w-5" />
+                        )}
+                        Pay with PayPal
+                        {paymentSettings.requireDeposit && paymentSettings.depositValue && (
+                          <span className="text-xs opacity-80 ml-1">
+                            ({paymentSettings.depositType === "percentage" ? `${paymentSettings.depositValue}% deposit` : `$${paymentSettings.depositValue} deposit`})
+                          </span>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+
+                  {paymentSettings?.allowFullPayment && paymentSettings.requireDeposit && (
+                    <p className="text-xs text-[#2a3d64]/50 mt-3 text-center">
+                      You can also pay in full after confirmation
+                    </p>
+                  )}
+
+                  <div className="flex items-center gap-2 mt-4 text-xs text-[#2a3d64]/50">
+                    <Shield className="h-4 w-4" />
+                    <span>Secure payment • Your data is encrypted and protected</span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {!hasPaymentEnabled && (
+              <p className="text-sm text-[#2a3d64]/50 mt-4">
+                Payment options will be available after booking confirmation.
+              </p>
+            )}
           </motion.div>
         </div>
       </section>
@@ -391,6 +521,25 @@ export function BookingForm() {
                     className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20 resize-none"
                   />
                 </div>
+
+                {/* Payment info note */}
+                {hasPaymentEnabled && (
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-[#c8993e]/5 border border-[#c8993e]/20">
+                    <Info className="h-5 w-5 text-[#c8993e] shrink-0 mt-0.5" />
+                    <div className="text-sm text-[#2a3d64]/70">
+                      <p className="font-medium text-[#1a2744] mb-1">Payment Information</p>
+                      <p>
+                        After submitting your booking request, we&apos;ll confirm availability and pricing.
+                        {paymentSettings?.requireDeposit
+                          ? ` A ${paymentSettings.depositType === "percentage" ? `${paymentSettings.depositValue}%` : `$${paymentSettings.depositValue}`} deposit is required to confirm your booking.`
+                          : " Payment is required to confirm your booking."}
+                        {" "}Secure payment via {paymentSettings?.stripeEnabled ? "Stripe" : ""}
+                        {paymentSettings?.stripeEnabled && paymentSettings?.paypalEnabled ? " or " : ""}
+                        {paymentSettings?.paypalEnabled ? "PayPal" : ""}.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   type="submit"

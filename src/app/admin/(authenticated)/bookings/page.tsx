@@ -43,6 +43,9 @@ import {
   MessageSquare,
   StickyNote,
   Calendar,
+  CreditCard,
+  DollarSign,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,6 +70,8 @@ interface Booking {
   message: string | null;
   status: string;
   adminNotes: string | null;
+  quotedPrice: number | null;
+  paymentStatus: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -202,6 +207,10 @@ export default function BookingsPage() {
   const [savingStatus, setSavingStatus] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
 
+  // Payment info state
+  const [editQuotedPrice, setEditQuotedPrice] = useState<string>("");
+  const [savingPrice, setSavingPrice] = useState(false);
+
   // ── Fetch ──────────────────────────────────────────────────────────────
 
   const fetchBookings = useCallback(async () => {
@@ -246,6 +255,7 @@ export default function BookingsPage() {
     setSelectedBooking(booking);
     setEditStatus(booking.status);
     setEditNotes(booking.adminNotes ?? "");
+    setEditQuotedPrice(booking.quotedPrice !== null ? (booking.quotedPrice / 100).toFixed(2) : "");
     setDetailOpen(true);
   };
 
@@ -297,6 +307,40 @@ export default function BookingsPage() {
     } finally {
       setSavingNotes(false);
     }
+  };
+
+  // ── Save quoted price ──────────────────────────────────────────────────
+
+  const handleSavePrice = async () => {
+    if (!selectedBooking) return;
+    setSavingPrice(true);
+    try {
+      const priceInCents = editQuotedPrice.trim()
+        ? Math.round(parseFloat(editQuotedPrice) * 100)
+        : null;
+      const res = await fetch(`/api/admin/bookings/${selectedBooking.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quotedPrice: priceInCents }),
+      });
+      if (!res.ok) throw new Error();
+      const updated: Booking = await res.json();
+      setSelectedBooking(updated);
+      setBookings((prev) =>
+        prev.map((b) => (b.id === updated.id ? updated : b))
+      );
+      toast.success("Quoted price updated");
+    } catch {
+      toast.error("Failed to save quoted price");
+    } finally {
+      setSavingPrice(false);
+    }
+  };
+
+  // ── Send payment link ──────────────────────────────────────────────────
+
+  const handleSendPaymentLink = () => {
+    toast.success("Payment link will be sent to customer email");
   };
 
   // ── Delete ─────────────────────────────────────────────────────────────
@@ -633,6 +677,88 @@ export default function BookingsPage() {
                     <AddonCheck enabled={selectedBooking.byob} label="BYOB" />
                     <AddonCheck enabled={selectedBooking.decorations} label="Decorations" />
                     <AddonCheck enabled={selectedBooking.needHelpPlanning} label="Help Planning" />
+                  </div>
+                </section>
+
+                {/* Payment Information */}
+                <section>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    <CreditCard className="h-4 w-4 inline mr-1.5 -mt-0.5" />
+                    Payment Information
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-sm flex items-center gap-1.5">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          Quoted Price ($)
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0.00"
+                            value={editQuotedPrice}
+                            onChange={(e) => setEditQuotedPrice(e.target.value)}
+                          />
+                          <Button
+                            onClick={handleSavePrice}
+                            disabled={savingPrice}
+                            size="sm"
+                            variant="outline"
+                            className="shrink-0"
+                          >
+                            {savingPrice ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Save className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedBooking.quotedPrice !== null
+                            ? `Current: ${(selectedBooking.quotedPrice / 100).toLocaleString("en-US", { style: "currency", currency: "USD" })}`
+                            : "No price set"}
+                        </p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-sm">Payment Status</Label>
+                        <div>
+                          <Badge
+                            variant="outline"
+                            className={
+                              selectedBooking.paymentStatus === "paid"
+                                ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                                : selectedBooking.paymentStatus === "deposit_paid"
+                                ? "bg-amber-100 text-amber-800 border-amber-200"
+                                : selectedBooking.paymentStatus === "partially_refunded"
+                                ? "bg-orange-100 text-orange-800 border-orange-200"
+                                : selectedBooking.paymentStatus === "refunded"
+                                ? "bg-purple-100 text-purple-800 border-purple-200"
+                                : "bg-gray-100 text-gray-800 border-gray-200"
+                            }
+                          >
+                            {selectedBooking.paymentStatus === "unpaid" && "Unpaid"}
+                            {selectedBooking.paymentStatus === "deposit_paid" && "Deposit Paid"}
+                            {selectedBooking.paymentStatus === "paid" && "Paid"}
+                            {selectedBooking.paymentStatus === "partially_refunded" && "Partial Refund"}
+                            {selectedBooking.paymentStatus === "refunded" && "Refunded"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    {selectedBooking.quotedPrice !== null && selectedBooking.quotedPrice > 0 && (
+                      <Button
+                        onClick={handleSendPaymentLink}
+                        size="sm"
+                        variant="outline"
+                        className="bg-[#1a2744] text-white hover:bg-[#2a3d64]"
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        Send Payment Link
+                      </Button>
+                    )}
                   </div>
                 </section>
 
