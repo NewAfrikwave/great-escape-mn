@@ -1,0 +1,16 @@
+.git
+.next
+node_modules
+npm-debug.log*
+dev.log
+*.log
+.env
+.env.*
+!.env.example
+db/*.db
+download
+examples
+mini-services
+skills
+agent-ctx
+tmp-*
