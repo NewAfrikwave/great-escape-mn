@@ -84,7 +84,7 @@ export default function SiteSettingsPage() {
       const mapped: SettingsState = { ...defaultSettings };
       for (const [key, value] of Object.entries(data)) {
         if (key in mapped) {
-          (mapped as Record<string, string>)[key] = value ?? "";
+          (mapped as unknown as Record<string, string>)[key] = value ?? "";
         }
       }
       setSettings(mapped);
@@ -140,7 +140,7 @@ export default function SiteSettingsPage() {
       const mapped: SettingsState = { ...defaultSettings };
       for (const [key, value] of Object.entries(data)) {
         if (key in mapped) {
-          (mapped as Record<string, string>)[key] = value ?? "";
+          (mapped as unknown as Record<string, string>)[key] = value ?? "";
         }
       }
       setSettings(mapped);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getPaymentSettings, getStripeClient, getPayPalClient } from "@/lib/payments";
 import paypal from "@paypal/checkout-server-sdk";
+import type Stripe from "stripe";
 
 export async function GET(request: Request) {
   try {
@@ -58,10 +59,15 @@ export async function GET(request: Request) {
       }
 
       // Get charge details
+      const paymentIntent =
+        typeof session.payment_intent === "object"
+          ? (session.payment_intent as Stripe.PaymentIntent)
+          : null;
+
       const chargeId =
         typeof session.payment_intent === "string"
           ? null
-          : session.payment_intent?.latest_charge;
+          : paymentIntent?.latest_charge;
 
       const receiptUrl =
         typeof chargeId === "object" && chargeId !== null
@@ -75,12 +81,12 @@ export async function GET(request: Request) {
           status: "completed",
           paidAt: new Date(),
           gatewayChargeId:
-            typeof session.payment_intent === "object" && session.payment_intent?.latest_charge
-              ? String(session.payment_intent.latest_charge)
+            paymentIntent?.latest_charge
+              ? String(paymentIntent.latest_charge)
               : typeof chargeId === "string"
                 ? chargeId
                 : null,
-          receiptUrl: receiptUrl || session.payment_intent?.receipt_url || null,
+          receiptUrl,
         },
       });
 

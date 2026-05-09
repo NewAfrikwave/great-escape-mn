@@ -52,7 +52,7 @@ export function Header() {
                 Great Escape MN
               </span>
               <span className="text-[10px] sm:text-xs text-[#e8c878] leading-tight hidden sm:block">
-                Three Rivers Taxi District Minnesota
+                Private Lake Cruises in Minnesota
               </span>
             </div>
           </Link>

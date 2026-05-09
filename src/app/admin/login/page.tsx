@@ -100,7 +100,7 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center text-white/30 text-xs mt-6">
-          Three Rivers Taxi District Minnesota
+          Private Lake Cruises in Minnesota
         </p>
       </div>
     </div>

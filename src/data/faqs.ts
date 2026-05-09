@@ -45,7 +45,7 @@ export const faqs: FAQ[] = [
     id: "payment",
     question: "Do we pay online?",
     answer:
-      "Online deposit and payment options are coming soon. For now, booking requests are submitted and confirmed directly with our team.",
+      "After your booking request is reviewed and confirmed, you can pay a deposit or the full balance securely online when payment options are enabled.",
   },
   {
     id: "after-booking",

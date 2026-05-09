@@ -201,12 +201,13 @@ async function main() {
     { question: "Can we bring food?", answer: "Yes, light snacks and food are welcome. Bring whatever makes your experience special — just keep it lake-friendly!", category: "Food & Drinks", sortOrder: 3 },
     { question: "Is fishing gear included?", answer: "Fishing gear may be available for fishing packages. Please confirm when booking so we can have everything ready for you.", category: "Fishing", sortOrder: 4 },
     { question: "What lakes do you serve?", answer: "We serve Prior Lake, Marion Lake, Lakeville, Lake Minnetonka, and nearby lakes by request. Have a favorite lake? Just ask!", category: "Service Areas", sortOrder: 5 },
-    { question: "Do we pay online?", answer: "Online deposit and payment options are coming soon. For now, booking requests are submitted and confirmed directly with our team.", category: "Pricing", sortOrder: 6 },
+    { question: "Do we pay online?", answer: "Yes. After your booking is reviewed and confirmed, you can pay a deposit or the full balance securely online when payment options are enabled.", category: "Pricing", sortOrder: 6 },
     { question: "What happens after I submit a booking request?", answer: "Our team will contact you to confirm availability, final pricing, lake location, and all the details to make your experience perfect.", category: "Booking", sortOrder: 7 },
     { question: "Can we decorate for birthdays or bachelorette events?", answer: "Yes, light decorations may be allowed if approved in advance. Let us know what you have in mind when booking!", category: "General", sortOrder: 8 },
     { question: "What happens if there's bad weather?", answer: "All bookings are subject to weather conditions. If we need to reschedule due to weather, we'll work with you to find the next best date at no extra charge.", category: "Weather", sortOrder: 9 },
   ];
 
+  await prisma.fAQ.deleteMany();
   for (const faq of faqsData) {
     await prisma.fAQ.create({ data: faq });
   }
@@ -228,6 +229,7 @@ async function main() {
     { title: "Custom Cruise Ready", altText: "Modern white and gray pontoon boat ready for a custom cruise", category: "Pontoon Boat", imageUrl: "/images/custom-cruise.png", isFeatured: false, sortOrder: 11 },
   ];
 
+  await prisma.galleryImage.deleteMany();
   for (const img of galleryData) {
     await prisma.galleryImage.create({ data: img });
   }
@@ -241,6 +243,7 @@ async function main() {
     { customerName: "Bride Tribe", customerTitleOrLocation: "Minnetonka, MN", rating: 5, quote: "My bachelorette party on the lake was perfect! BYOB, great music, stunning views. The captain made sure we had the best time.", experienceType: "Bachelorette Cruise", isFeatured: false, sortOrder: 3 },
   ];
 
+  await prisma.testimonial.deleteMany();
   for (const t of testimonialsData) {
     await prisma.testimonial.create({ data: t });
   }
@@ -385,6 +388,60 @@ async function main() {
     },
   });
   console.log("✅ Payment settings seeded");
+
+  const bookingCount = await prisma.booking.count();
+  if (bookingCount === 0) {
+    await prisma.booking.createMany({
+      data: [
+        {
+          fullName: "Taylor Morgan",
+          email: "taylor@example.com",
+          phone: "651-555-0191",
+          packageSlug: "sunset-cruise",
+          preferredLake: "Lake Minnetonka",
+          preferredDate: "2026-06-20",
+          preferredTime: "6:30 PM",
+          passengers: 2,
+          occasion: "Anniversary",
+          byob: true,
+          message: "Looking for a quiet sunset route.",
+          status: "new",
+          quotedPrice: 15000,
+        },
+        {
+          fullName: "Jordan Lee",
+          email: "jordan@example.com",
+          phone: "612-555-0148",
+          packageSlug: "family-fun-day",
+          preferredLake: "Prior Lake",
+          preferredDate: "2026-07-12",
+          preferredTime: "1:00 PM",
+          passengers: 5,
+          tubing: true,
+          needHelpPlanning: true,
+          message: "Family visiting from out of town.",
+          status: "confirmed",
+          quotedPrice: 25000,
+        },
+        {
+          fullName: "Morgan Patel",
+          email: "morgan@example.com",
+          phone: "952-555-0184",
+          packageSlug: "bachelorette-cruise",
+          preferredLake: "Lake Minnetonka",
+          preferredDate: "2026-08-08",
+          preferredTime: "3:00 PM",
+          passengers: 6,
+          occasion: "Bachelorette Party",
+          decorations: true,
+          byob: true,
+          status: "reviewing",
+          quotedPrice: 50000,
+        },
+      ],
+    });
+  }
+  console.log("✅ Demo bookings ready");
 
   // 13. Update some bookings with quoted prices for demo
   const bookings = await prisma.booking.findMany({ take: 3 });

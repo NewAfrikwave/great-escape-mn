@@ -67,18 +67,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-export async function GET() {
-  try {
-    const bookings = await db.booking.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json({ bookings });
-  } catch (error) {
-    console.error("Fetch bookings error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch bookings." },
-      { status: 500 }
-    );
-  }
-}
