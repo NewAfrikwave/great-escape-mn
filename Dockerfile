@@ -4,9 +4,9 @@ WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 COPY prisma ./prisma/
-RUN npm ci --no-audit --no-fund
+RUN npm install --omit=optional --no-audit --no-fund
 
 # ---- Build ----
 FROM node:20-bookworm AS builder
