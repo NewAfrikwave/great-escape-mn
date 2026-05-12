@@ -13,7 +13,12 @@ async function main() {
 
   await prisma.adminUser.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: {
+      name: "Admin",
+      passwordHash,
+      role: "owner",
+      isActive: true,
+    },
     create: {
       name: "Admin",
       email: adminEmail,
@@ -22,7 +27,7 @@ async function main() {
       isActive: true,
     },
   });
-  console.log("✅ Admin user created:", adminEmail);
+  console.log("✅ Admin user ready:", adminEmail);
 
   // 2. Seed Packages
   const packagesData = [
