@@ -47,8 +47,8 @@ const occasions = [
 
 export function BookingForm() {
   const searchParams = useSearchParams();
-  const { packages } = usePackages();
-  const { lakes } = useLakes();
+  const { packages, loading: packagesLoading } = usePackages();
+  const { lakes, loading: lakesLoading } = useLakes();
   const { paymentSettings } = usePaymentSettings();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -156,6 +156,8 @@ export function BookingForm() {
   };
 
   const hasPaymentEnabled = paymentSettings?.stripeEnabled || paymentSettings?.paypalEnabled;
+  const activePackages = packages.filter((pkg) => pkg.isActive);
+  const activeLakes = lakes.filter((lake) => lake.isActive);
 
   if (submitted) {
     return (
@@ -364,19 +366,31 @@ export function BookingForm() {
                     <Label>Preferred Package *</Label>
                     <Select
                       value={form.packageSlug}
+                      disabled={packagesLoading}
                       onValueChange={(value) =>
                         setForm((prev) => ({ ...prev, packageSlug: value }))
                       }
                     >
-                      <SelectTrigger className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20">
-                        <SelectValue placeholder="Select an experience" />
+                      <SelectTrigger className="w-full border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20">
+                        <SelectValue
+                          placeholder={
+                            packagesLoading
+                              ? "Loading experiences..."
+                              : "Select an experience"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {packages.map((pkg) => (
+                        {activePackages.map((pkg) => (
                           <SelectItem key={pkg.id} value={pkg.slug}>
                             {pkg.title}
                           </SelectItem>
                         ))}
+                        {activePackages.length === 0 && !packagesLoading && (
+                          <SelectItem value="custom-experience">
+                            Custom private cruise
+                          </SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -384,6 +398,7 @@ export function BookingForm() {
                     <Label>Preferred Lake</Label>
                     <Select
                       value={form.preferredLake}
+                      disabled={lakesLoading}
                       onValueChange={(value) =>
                         setForm((prev) => ({
                           ...prev,
@@ -391,11 +406,15 @@ export function BookingForm() {
                         }))
                       }
                     >
-                      <SelectTrigger className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20">
-                        <SelectValue placeholder="Select a lake" />
+                      <SelectTrigger className="w-full border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20">
+                        <SelectValue
+                          placeholder={
+                            lakesLoading ? "Loading lakes..." : "Select a lake"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {lakes.map((lake) => (
+                        {activeLakes.map((lake) => (
                           <SelectItem key={lake.id} value={lake.name}>
                             {lake.name}
                           </SelectItem>
@@ -438,7 +457,7 @@ export function BookingForm() {
                         setForm((prev) => ({ ...prev, occasion: value }))
                       }
                     >
-                      <SelectTrigger className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20">
+                      <SelectTrigger className="w-full border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20">
                         <SelectValue placeholder="Select occasion" />
                       </SelectTrigger>
                       <SelectContent>
