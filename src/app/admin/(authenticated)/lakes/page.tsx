@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import {
   Plus,
   Pencil,
@@ -489,31 +490,16 @@ export default function AdminLakesPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="imageUrl">Image URL</Label>
-              <Input
-                id="imageUrl"
-                value={form.imageUrl}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, imageUrl: e.target.value }))
-                }
-                placeholder="https://example.com/lake-image.jpg"
-              />
-            </div>
-
-            {/* Image Preview */}
-            {form.imageUrl && (
-              <div className="rounded-lg overflow-hidden border bg-muted">
-                <img
-                  src={form.imageUrl}
-                  alt="Preview"
-                  className="w-full h-32 object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            )}
+            <ImageUploadField
+              id="imageUrl"
+              label="Lake Image"
+              value={form.imageUrl}
+              guide="Recommended size: 1600 x 900px for lake/service-area images."
+              previewHeight="h-32"
+              onChange={(value) =>
+                setForm((prev) => ({ ...prev, imageUrl: value }))
+              }
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import {
   Plus,
   Pencil,
@@ -468,33 +469,16 @@ export default function AdminGalleryPage() {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="imageUrl">
-                Image URL <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="imageUrl"
-                value={form.imageUrl}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, imageUrl: e.target.value }))
-                }
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-
-            {/* Image Preview */}
-            {form.imageUrl && (
-              <div className="rounded-lg overflow-hidden border bg-muted">
-                <img
-                  src={form.imageUrl}
-                  alt="Preview"
-                  className="w-full h-40 object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            )}
+            <ImageUploadField
+              id="imageUrl"
+              label="Gallery Image"
+              value={form.imageUrl}
+              required
+              guide="Recommended size: 1600 x 1000px for gallery photos."
+              onChange={(value) =>
+                setForm((prev) => ({ ...prev, imageUrl: value }))
+              }
+            />
 
             <div className="space-y-2">
               <Label htmlFor="caption">Caption</Label>

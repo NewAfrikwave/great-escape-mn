@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import {
   Plus,
   Pencil,
@@ -704,15 +705,15 @@ export default function AdminPackagesPage() {
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="imageUrl">Image URL</Label>
-                  <Input
+                <div className="sm:col-span-2">
+                  <ImageUploadField
                     id="imageUrl"
+                    label="Package Image"
                     value={form.imageUrl}
-                    onChange={(e) =>
-                      setForm((prev) => ({ ...prev, imageUrl: e.target.value }))
+                    guide="Recommended size: 1600 x 1000px for package cards and experience pages."
+                    onChange={(value) =>
+                      setForm((prev) => ({ ...prev, imageUrl: value }))
                     }
-                    placeholder="https://example.com/image.jpg"
                   />
                 </div>
 
