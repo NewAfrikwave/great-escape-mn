@@ -168,7 +168,7 @@ export async function POST(request: Request) {
         application_context: {
           return_url: `${origin}/api/payments/success?gateway=paypal&paymentId=${payment.id}`,
           cancel_url: `${origin}/api/payments/cancel?gateway=paypal&paymentId=${payment.id}`,
-          brand_name: "Great Escape MN",
+          brand_name: "A Great Escape",
         },
       });
 

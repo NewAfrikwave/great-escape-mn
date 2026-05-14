@@ -6,7 +6,7 @@ import { Toaster as SonnerToaster } from "sonner";
 export const metadata: Metadata = {
   metadataBase: new URL("https://greatescapemn.com"),
   title:
-    "Great Escape MN | Private Boat Cruises & Pontoon Experiences in Minnesota",
+    "A Great Escape | Private Boat Cruises & Pontoon Experiences in Minnesota",
   description:
     "Book private captain-led pontoon cruises, sunset rides, family lake days, fishing trips, and bachelorette boat experiences across Minnesota lakes. Prior Lake, Lake Minnetonka, and more.",
   keywords: [
@@ -19,35 +19,35 @@ export const metadata: Metadata = {
     "Bachelorette boat cruise Minnesota",
     "Family boat ride Minnesota",
     "Fishing pontoon Minnesota",
-    "Great Escape MN",
+    "A Great Escape",
     "pontoon cruise Minnesota",
     "lake cruise near me",
   ],
-  authors: [{ name: "Great Escape MN" }],
+  authors: [{ name: "A Great Escape" }],
   icons: {
     icon: "/images/logo.png",
   },
   openGraph: {
     title:
-      "Great Escape MN | Private Boat Cruises & Pontoon Experiences in Minnesota",
+      "A Great Escape | Private Boat Cruises & Pontoon Experiences in Minnesota",
     description:
       "Book private captain-led pontoon cruises, sunset rides, family lake days, fishing trips, and bachelorette boat experiences across Minnesota lakes.",
     url: "https://greatescapemn.com",
-    siteName: "Great Escape MN",
+    siteName: "A Great Escape",
     type: "website",
     images: [
       {
         url: "/images/hero-sunset-cruise.png",
         width: 1344,
         height: 768,
-        alt: "Great Escape MN - Private Pontoon Cruise on Minnesota Lake at Sunset",
+        alt: "A Great Escape - Private Pontoon Cruise on Minnesota Lake at Sunset",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title:
-      "Great Escape MN | Private Boat Cruises & Pontoon Experiences in Minnesota",
+      "A Great Escape | Private Boat Cruises & Pontoon Experiences in Minnesota",
     description:
       "Book private captain-led pontoon cruises, sunset rides, family lake days, fishing trips, and bachelorette boat experiences across Minnesota lakes.",
     images: ["/images/hero-sunset-cruise.png"],

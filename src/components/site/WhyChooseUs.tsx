@@ -72,7 +72,7 @@ export function WhyChooseUs() {
             transition={{ duration: 0.5 }}
           >
             <div className="inline-flex items-center gap-2 bg-[#c8993e]/20 border border-[#c8993e]/30 rounded-full px-4 py-1.5 text-[#e8c878] text-sm font-medium mb-4">
-              Why Great Escape MN
+              Why A Great Escape
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Why Choose Us

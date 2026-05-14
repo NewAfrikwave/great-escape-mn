@@ -49,7 +49,7 @@ export function Header() {
             <Anchor className="h-7 w-7 text-[#c8993e]" />
             <div className="flex flex-col">
               <span className="text-lg sm:text-xl font-bold tracking-tight leading-tight">
-                Great Escape MN
+                A Great Escape
               </span>
               <span className="text-[10px] sm:text-xs text-[#e8c878] leading-tight hidden sm:block">
                 Private Lake Cruises in Minnesota
@@ -102,7 +102,7 @@ export function Header() {
                 <div className="flex items-center justify-between p-4 border-b border-[#2a3d64]">
                   <div className="flex items-center gap-2">
                     <Anchor className="h-5 w-5 text-[#c8993e]" />
-                    <span className="font-bold">Great Escape MN</span>
+                    <span className="font-bold">A Great Escape</span>
                   </div>
                   <Button
                     variant="ghost"

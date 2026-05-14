@@ -359,7 +359,7 @@ export default function AdminDashboardPage() {
           Dashboard
         </h1>
         <p className="text-gray-500 mt-1 text-sm sm:text-base">
-          Welcome back to Great Escape MN admin panel
+          Welcome back to A Great Escape admin panel
         </p>
       </div>
 

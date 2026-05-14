@@ -62,7 +62,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <Link href="/admin" onClick={onNavigate} className="flex items-center gap-2">
           <Anchor className="h-7 w-7 text-[#c8993e]" />
           <div>
-            <span className="text-lg font-bold text-white block leading-tight">Great Escape MN</span>
+            <span className="text-lg font-bold text-white block leading-tight">A Great Escape</span>
             <span className="text-[10px] text-[#e8c878]">Admin Panel</span>
           </div>
         </Link>

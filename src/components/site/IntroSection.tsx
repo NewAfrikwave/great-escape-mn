@@ -11,7 +11,7 @@ export function IntroSection() {
     "Your Private Lake Experience Awaits";
   const body =
     content?.homepage_intro_body?.content ||
-    "Great Escape MN offers private lake experiences designed for couples, families, friends, and small groups. Whether you are celebrating love, planning a birthday, enjoying a family day, fishing with friends, or just escaping for a peaceful sunset ride — we help create a simple, memorable, and beautiful experience on the water.";
+    "A Great Escape offers private lake experiences designed for couples, families, friends, and small groups. Whether you are celebrating love, planning a birthday, enjoying a family day, fishing with friends, or just escaping for a peaceful sunset ride — we help create a simple, memorable, and beautiful experience on the water.";
 
   return (
     <section id="intro" className="py-20 sm:py-28 bg-[#faf8f0]">
@@ -23,7 +23,7 @@ export function IntroSection() {
           transition={{ duration: 0.6 }}
         >
           <div className="inline-flex items-center gap-2 bg-[#c8993e]/10 border border-[#c8993e]/20 rounded-full px-4 py-1.5 text-[#c8993e] text-sm font-medium mb-6">
-            Welcome to Great Escape MN
+            Welcome to A Great Escape
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#1a2744] mb-6 leading-tight">
             {loading ? "Loading..." : title}

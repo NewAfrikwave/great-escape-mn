@@ -176,7 +176,7 @@ export function BookingForm() {
               Thank You!
             </h3>
             <p className="text-[#2a3d64]/60 leading-relaxed mb-6">
-              Your booking request has been received. Great Escape MN will
+              Your booking request has been received. A Great Escape will
               contact you shortly to confirm availability, final pricing, and
               details.
             </p>

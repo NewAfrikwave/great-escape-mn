@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         depositValue: "50",
         requireDeposit: true,
         allowFullPayment: true,
-        paymentDescription: "Great Escape MN - Lake Experience",
+        paymentDescription: "A Great Escape - Lake Experience",
         receiptNote: null,
       });
     }

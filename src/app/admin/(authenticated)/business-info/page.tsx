@@ -222,7 +222,7 @@ export default function BusinessInfoPage() {
                 id="businessName"
                 value={form.businessName}
                 onChange={(e) => updateField("businessName", e.target.value)}
-                placeholder="Great Escape MN"
+                placeholder="A Great Escape"
               />
             </div>
             <div className="space-y-2">
@@ -401,7 +401,7 @@ export default function BusinessInfoPage() {
               id="copyrightText"
               value={form.copyrightText}
               onChange={(e) => updateField("copyrightText", e.target.value)}
-              placeholder="© 2024 Great Escape MN. All rights reserved."
+              placeholder="© 2024 A Great Escape. All rights reserved."
             />
           </div>
         </CardContent>

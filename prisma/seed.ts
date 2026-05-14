@@ -280,16 +280,20 @@ async function main() {
   // 7. Seed Business Info
   await prisma.businessInfo.upsert({
     where: { id: "default" },
-    update: {},
+    update: {
+      businessName: "A Great Escape",
+      brandSubtitle: "Private Lake Cruises & Pontoon Experiences",
+      copyrightText: "A Great Escape. All rights reserved.",
+    },
     create: {
       id: "default",
-      businessName: "Great Escape MN",
+      businessName: "A Great Escape",
       brandSubtitle: "Private Lake Cruises & Pontoon Experiences",
       email: "greatescapemn@gmail.com",
       phone: "651-332-4859",
       serviceAreaDescription: "Minnesota lakes including Prior Lake, Marion Lake, Lakeville, Lake Minnetonka, and nearby areas by request.",
       footerDescription: "Private captain-led pontoon experiences on Minnesota's most beautiful lakes.",
-      copyrightText: "Great Escape MN. All rights reserved.",
+      copyrightText: "A Great Escape. All rights reserved.",
     },
   });
   console.log("✅ Business info seeded");
@@ -301,17 +305,17 @@ async function main() {
     { pageKey: "homepage_hero_cta_primary", title: "Primary CTA Text", content: "Book Your Getaway" },
     { pageKey: "homepage_hero_cta_secondary", title: "Secondary CTA Text", content: "View Packages" },
     { pageKey: "homepage_intro_title", title: "Intro Section Title", content: "Your Private Lake Experience Awaits" },
-    { pageKey: "homepage_intro_body", title: "Intro Section Body", content: "Great Escape MN offers private lake experiences designed for couples, families, friends, and small groups. Whether you are celebrating love, planning a birthday, enjoying a family day, fishing with friends, or just escaping for a peaceful sunset ride — we help create a simple, memorable, and beautiful experience on the water." },
+    { pageKey: "homepage_intro_body", title: "Intro Section Body", content: "A Great Escape offers private lake experiences designed for couples, families, friends, and small groups. Whether you are celebrating love, planning a birthday, enjoying a family day, fishing with friends, or just escaping for a peaceful sunset ride — we help create a simple, memorable, and beautiful experience on the water." },
     { pageKey: "homepage_why_title", title: "Why Choose Us Title", content: "Why Choose Us" },
     { pageKey: "homepage_cta_headline", title: "Final CTA Headline", content: "Ready to Book Your Lake Escape?" },
     { pageKey: "homepage_cta_body", title: "Final CTA Body", content: "Submit a booking request and our team will confirm availability, pricing, and all the details for your perfect day on the water." },
     { pageKey: "homepage_cta_button", title: "Final CTA Button", content: "Start Booking Request" },
     { pageKey: "about_headline", title: "About Headline", content: "Your Gateway to Minnesota Lake Memories" },
-    { pageKey: "about_intro", title: "About Intro", content: "Great Escape MN was created to give couples, families, friends, and small groups an easy way to enjoy Minnesota lakes without the stress of owning or operating a boat." },
+    { pageKey: "about_intro", title: "About Intro", content: "A Great Escape was created to give couples, families, friends, and small groups an easy way to enjoy Minnesota lakes without the stress of owning or operating a boat." },
     { pageKey: "about_story", title: "About Story", content: "Every experience is private, captain-led, and designed around comfort, safety, and unforgettable views. Whether you're looking for a romantic sunset cruise, a fun family day, a fishing trip with friends, or a special celebration on the water — we're here to make it happen." },
     { pageKey: "booking_headline", title: "Booking Page Headline", content: "Request a Booking" },
     { pageKey: "booking_description", title: "Booking Page Description", content: "Fill out the form below and we'll get back to you to confirm availability and details." },
-    { pageKey: "booking_confirmation", title: "Booking Confirmation Message", content: "Thank you! Your booking request has been received. Great Escape MN will contact you shortly to confirm availability, final pricing, and details." },
+    { pageKey: "booking_confirmation", title: "Booking Confirmation Message", content: "Thank you! Your booking request has been received. A Great Escape will contact you shortly to confirm availability, final pricing, and details." },
     { pageKey: "contact_headline", title: "Contact Page Headline", content: "Contact Us" },
     { pageKey: "gallery_headline", title: "Gallery Headline", content: "Moments on the Water" },
     { pageKey: "faq_headline", title: "FAQ Headline", content: "Frequently Asked Questions" },
@@ -320,7 +324,10 @@ async function main() {
   for (const pc of pageContentData) {
     await prisma.pageContent.upsert({
       where: { pageKey: pc.pageKey },
-      update: {},
+      update: {
+        title: pc.title,
+        content: pc.content,
+      },
       create: pc,
     });
   }
@@ -349,19 +356,19 @@ async function main() {
 
   // 10. Seed SEO Settings
   const seoData = [
-    { pageKey: "homepage", seoTitle: "Great Escape MN | Private Boat Cruises & Pontoon Experiences in Minnesota", seoDescription: "Book private captain-led pontoon cruises, sunset rides, family lake days, fishing trips, and bachelorette boat experiences across Minnesota lakes.", keywords: "Minnesota boat cruise,Minnesota pontoon rental with captain,Sunset cruise Minnesota,Private lake cruise Minnesota,Lake Minnetonka boat cruise,Prior Lake boat rental" },
-    { pageKey: "experiences", seoTitle: "Lake Experiences & Packages | Great Escape MN", seoDescription: "Explore our private pontoon cruise packages — sunset cruises, family lake days, fishing trips, bachelorette parties, fall color tours, and custom experiences.", keywords: "Minnesota pontoon packages,private lake cruise packages,sunset cruise Minnesota" },
-    { pageKey: "booking", seoTitle: "Book Your Lake Experience | Great Escape MN", seoDescription: "Request a private lake cruise booking. Choose your experience, lake, date, and let us create your perfect day on the water.", keywords: "book lake cruise Minnesota,pontoon rental booking" },
-    { pageKey: "gallery", seoTitle: "Gallery | Great Escape MN", seoDescription: "See our private pontoon cruises in action. Beautiful sunset photos, family lake days, fishing trips, and celebrations on Minnesota lakes.", keywords: "Minnesota lake cruise photos,pontoon boat pictures" },
-    { pageKey: "about", seoTitle: "About Great Escape MN | Private Lake Experiences", seoDescription: "Learn about Great Escape MN — your gateway to private captain-led pontoon experiences on Minnesota's most beautiful lakes.", keywords: "Great Escape MN about,Minnesota lake cruise company" },
-    { pageKey: "faq", seoTitle: "FAQ | Great Escape MN", seoDescription: "Common questions about our private pontoon cruises — passengers, BYOB, fishing gear, lakes served, pricing, and more.", keywords: "lake cruise FAQ Minnesota,pontoon rental questions" },
-    { pageKey: "contact", seoTitle: "Contact Us | Great Escape MN", seoDescription: "Get in touch with Great Escape MN. Email, phone, and contact form for booking inquiries and questions.", keywords: "Great Escape MN contact,Minnesota boat cruise contact" },
+    { pageKey: "homepage", seoTitle: "A Great Escape | Private Boat Cruises & Pontoon Experiences in Minnesota", seoDescription: "Book private captain-led pontoon cruises, sunset rides, family lake days, fishing trips, and bachelorette boat experiences across Minnesota lakes.", keywords: "Minnesota boat cruise,Minnesota pontoon rental with captain,Sunset cruise Minnesota,Private lake cruise Minnesota,Lake Minnetonka boat cruise,Prior Lake boat rental" },
+    { pageKey: "experiences", seoTitle: "Lake Experiences & Packages | A Great Escape", seoDescription: "Explore our private pontoon cruise packages — sunset cruises, family lake days, fishing trips, bachelorette parties, fall color tours, and custom experiences.", keywords: "Minnesota pontoon packages,private lake cruise packages,sunset cruise Minnesota" },
+    { pageKey: "booking", seoTitle: "Book Your Lake Experience | A Great Escape", seoDescription: "Request a private lake cruise booking. Choose your experience, lake, date, and let us create your perfect day on the water.", keywords: "book lake cruise Minnesota,pontoon rental booking" },
+    { pageKey: "gallery", seoTitle: "Gallery | A Great Escape", seoDescription: "See our private pontoon cruises in action. Beautiful sunset photos, family lake days, fishing trips, and celebrations on Minnesota lakes.", keywords: "Minnesota lake cruise photos,pontoon boat pictures" },
+    { pageKey: "about", seoTitle: "About A Great Escape | Private Lake Experiences", seoDescription: "Learn about A Great Escape — your gateway to private captain-led pontoon experiences on Minnesota's most beautiful lakes.", keywords: "A Great Escape about,Minnesota lake cruise company" },
+    { pageKey: "faq", seoTitle: "FAQ | A Great Escape", seoDescription: "Common questions about our private pontoon cruises — passengers, BYOB, fishing gear, lakes served, pricing, and more.", keywords: "lake cruise FAQ Minnesota,pontoon rental questions" },
+    { pageKey: "contact", seoTitle: "Contact Us | A Great Escape", seoDescription: "Get in touch with A Great Escape. Email, phone, and contact form for booking inquiries and questions.", keywords: "A Great Escape contact,Minnesota boat cruise contact" },
   ];
 
   for (const seo of seoData) {
     await prisma.seoSetting.upsert({
       where: { pageKey: seo.pageKey },
-      update: {},
+      update: seo,
       create: seo,
     });
   }
@@ -399,7 +406,10 @@ async function main() {
   // 12. Seed Payment Settings
   await prisma.paymentSettings.upsert({
     where: { id: "default" },
-    update: {},
+    update: {
+      paymentDescription: "A Great Escape - Lake Experience",
+      receiptNote: "Thank you for booking with A Great Escape! All bookings are subject to weather, availability, lake rules, and safety requirements.",
+    },
     create: {
       id: "default",
       stripeEnabled: false,
@@ -411,8 +421,8 @@ async function main() {
       depositValue: "50",
       requireDeposit: true,
       allowFullPayment: true,
-      paymentDescription: "Great Escape MN - Lake Experience",
-      receiptNote: "Thank you for booking with Great Escape MN! All bookings are subject to weather, availability, lake rules, and safety requirements.",
+      paymentDescription: "A Great Escape - Lake Experience",
+      receiptNote: "Thank you for booking with A Great Escape! All bookings are subject to weather, availability, lake rules, and safety requirements.",
     },
   });
   console.log("✅ Payment settings seeded");

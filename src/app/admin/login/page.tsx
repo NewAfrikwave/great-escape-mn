@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Anchor className="h-12 w-12 text-[#c8993e] mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white">Great Escape MN</h1>
+          <h1 className="text-2xl font-bold text-white">A Great Escape</h1>
           <p className="text-white/50 text-sm mt-1">Admin Panel Login</p>
         </div>
 

@@ -207,7 +207,7 @@ export default function PaymentSettingsPage() {
     depositValue: "50",
     requireDeposit: true,
     allowFullPayment: true,
-    paymentDescription: "Great Escape MN - Lake Experience",
+    paymentDescription: "A Great Escape - Lake Experience",
     receiptNote: "",
   });
 
@@ -750,7 +750,7 @@ export default function PaymentSettingsPage() {
           <div className="space-y-1.5">
             <Label className="text-sm">Payment Description</Label>
             <Input
-              placeholder="Great Escape MN - Lake Experience"
+              placeholder="A Great Escape - Lake Experience"
               value={form.paymentDescription}
               onChange={(e) => updateField("paymentDescription", e.target.value)}
             />
@@ -763,7 +763,7 @@ export default function PaymentSettingsPage() {
           <div className="space-y-1.5">
             <Label className="text-sm">Receipt Note (optional)</Label>
             <Textarea
-              placeholder="Thank you for choosing Great Escape MN! We look forward to your lake experience."
+              placeholder="Thank you for choosing A Great Escape! We look forward to your lake experience."
               value={form.receiptNote}
               onChange={(e) => updateField("receiptNote", e.target.value)}
               rows={3}

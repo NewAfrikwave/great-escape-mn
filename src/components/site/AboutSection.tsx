@@ -71,7 +71,7 @@ export function AboutSection() {
             </h2>
             <div className="space-y-4 text-[#2a3d64]/70 leading-relaxed">
               <p>
-                Great Escape MN was created to give couples, families, friends,
+                A Great Escape was created to give couples, families, friends,
                 and small groups an easy way to enjoy Minnesota lakes without the
                 stress of owning or operating a boat.
               </p>

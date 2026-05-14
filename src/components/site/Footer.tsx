@@ -19,12 +19,12 @@ export function Footer() {
   const { lakes } = useLakes();
   const { info } = useBusinessInfo();
 
-  const businessName = info?.businessName || "Great Escape MN";
+  const businessName = info?.businessName || "A Great Escape";
   const email = info?.email || "greatescapemn@gmail.com";
   const phone = info?.phone || "651-332-4859";
   const serviceArea = info?.serviceAreaDescription || "Minnesota lakes including Prior Lake, Marion Lake, Lakeville, Lake Minnetonka, and nearby areas by request.";
   const footerDesc = info?.footerDescription || "Private captain-led pontoon experiences on Minnesota's most beautiful lakes.";
-  const copyright = info?.copyrightText || "Great Escape MN. All rights reserved.";
+  const copyright = info?.copyrightText || "A Great Escape. All rights reserved.";
 
   return (
     <footer className="bg-[#0f1a2e] text-white relative">
