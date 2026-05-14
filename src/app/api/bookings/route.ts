@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { sendBookingNotification } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -50,6 +51,12 @@ export async function POST(request: Request) {
         message: message || null,
       },
     });
+
+    try {
+      await sendBookingNotification(booking);
+    } catch (notificationError) {
+      console.error("Booking notification error:", notificationError);
+    }
 
     return NextResponse.json(
       {

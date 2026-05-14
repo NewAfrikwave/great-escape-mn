@@ -1,6 +1,6 @@
-# Great Escape MN Website and Admin CMS
+# A Great Escape Website and Admin CMS
 
-Production-ready Next.js app for Great Escape MN private lake cruises, with a protected admin panel, booking management, editable CMS content, payment settings, and PostgreSQL persistence through Prisma.
+Production-ready Next.js app for A Great Escape private lake cruises, with a protected admin panel, booking management, editable CMS content, payment settings, and PostgreSQL persistence through Prisma.
 
 ## Local Setup
 
@@ -25,6 +25,16 @@ NEXT_PUBLIC_SITE_URL=https://your-production-domain
 ```
 
 `DATABASE_URL` is supplied automatically when you add Railway PostgreSQL. `AUTH_SECRET` signs admin session cookies; generate it with `openssl rand -base64 32`. `ADMIN_EMAIL` and `ADMIN_PASSWORD` are used by `npm run seed` to create the first admin account.
+
+Optional booking notification variables:
+
+```bash
+RESEND_API_KEY=re_your_resend_api_key
+BOOKING_NOTIFICATION_EMAIL=admin@greatescapemn.com
+EMAIL_FROM="A Great Escape <bookings@yourdomain.com>"
+```
+
+If these are set, every public booking request is saved to the database and an email notification is sent to `BOOKING_NOTIFICATION_EMAIL`. If they are not set, bookings still appear in Admin > Bookings.
 
 Optional payment variables can be configured in the admin panel instead of environment variables:
 
