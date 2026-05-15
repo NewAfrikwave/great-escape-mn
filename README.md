@@ -36,6 +36,8 @@ EMAIL_FROM="A Great Escape <bookings@yourdomain.com>"
 
 If these are set, every public booking request is saved to the database and an email notification is sent to `BOOKING_NOTIFICATION_EMAIL`. If they are not set, bookings still appear in Admin > Bookings.
 
+Booking notification emails include an "Add to Google Calendar" link when the customer provides a preferred date. Admins can also open a booking in Admin > Bookings and click "Add to Google Calendar".
+
 Optional payment variables can be configured in the admin panel instead of environment variables:
 
 ```bash
@@ -68,6 +70,14 @@ npm run seed
 ```
 
 The seed command is safe to rerun. It creates or confirms the admin account from `ADMIN_EMAIL` and `ADMIN_PASSWORD`, seeds packages, FAQs, gallery images, business info, homepage content, SEO settings, site settings, payment settings, and demo bookings.
+
+After changes that include Prisma migrations, run:
+
+```bash
+npm run db:migrate:deploy
+```
+
+Admin image uploads accept JPG and PNG files. Large phone photos are resized in the browser before upload. Railway container storage is temporary across redeploys, so use the admin uploader for quick updates and connect persistent object storage later if you need uploads to survive every redeploy.
 
 ## App Commands
 

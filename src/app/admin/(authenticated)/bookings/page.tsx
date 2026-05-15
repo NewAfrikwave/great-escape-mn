@@ -48,6 +48,7 @@ import {
   Send,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getBookingCalendarUrl } from "@/lib/calendar";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -72,6 +73,10 @@ interface Booking {
   adminNotes: string | null;
   quotedPrice: number | null;
   paymentStatus: string;
+  waiverAccepted: boolean;
+  waiverSignature: string | null;
+  waiverAcceptedAt: string | null;
+  waiverTextVersion: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -377,6 +382,17 @@ export default function BookingsPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────
 
+  const selectedCalendarUrl = selectedBooking
+    ? getBookingCalendarUrl({
+        ...selectedBooking,
+        createdAt: new Date(selectedBooking.createdAt),
+        updatedAt: new Date(selectedBooking.updatedAt),
+        waiverAcceptedAt: selectedBooking.waiverAcceptedAt
+          ? new Date(selectedBooking.waiverAcceptedAt)
+          : null,
+      })
+    : "";
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
@@ -600,6 +616,22 @@ export default function BookingsPage() {
                         {selectedBooking.phone}
                       </a>
                     </div>
+                    {selectedCalendarUrl && (
+                      <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-[#1a2744]/5 sm:col-span-2">
+                        <div className="flex items-center gap-2 text-sm text-[#1a2744]">
+                          <Calendar className="h-4 w-4 shrink-0" />
+                          Add this booking to your calendar
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(selectedCalendarUrl, "_blank", "noopener,noreferrer")}
+                        >
+                          Add to Google Calendar
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </section>
 
@@ -677,6 +709,25 @@ export default function BookingsPage() {
                     <AddonCheck enabled={selectedBooking.byob} label="BYOB" />
                     <AddonCheck enabled={selectedBooking.decorations} label="Decorations" />
                     <AddonCheck enabled={selectedBooking.needHelpPlanning} label="Help Planning" />
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    Waiver
+                  </h3>
+                  <div className="rounded-lg border bg-muted/40 p-4 space-y-2 text-sm">
+                    <AddonCheck
+                      enabled={selectedBooking.waiverAccepted}
+                      label="Damage responsibility waiver accepted"
+                    />
+                    <p>
+                      <span className="font-medium">Signature:</span>{" "}
+                      {selectedBooking.waiverSignature || "Not provided"}
+                    </p>
+                    <p className="text-muted-foreground">
+                      Signed: {formatDateTime(selectedBooking.waiverAcceptedAt)}
+                    </p>
                   </div>
                 </section>
 

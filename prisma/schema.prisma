@@ -250,6 +250,10 @@ model Booking {
   decorations      Boolean  @default(false)
   needHelpPlanning Boolean  @default(false)
   message          String?
+  waiverAccepted   Boolean  @default(false)
+  waiverSignature  String?
+  waiverAcceptedAt DateTime?
+  waiverTextVersion String?
   status           String   @default("new")
   adminNotes       String?
   quotedPrice      Int?     // Quoted price in cents (set by admin)

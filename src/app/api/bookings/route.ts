@@ -22,12 +22,21 @@ export async function POST(request: Request) {
       decorations,
       needHelpPlanning,
       message,
+      waiverAccepted,
+      waiverSignature,
     } = body;
 
     // Validate required fields
     if (!fullName || !email || !phone) {
       return NextResponse.json(
         { error: "Full name, email, and phone are required." },
+        { status: 400 }
+      );
+    }
+
+    if (!waiverAccepted || !String(waiverSignature || "").trim()) {
+      return NextResponse.json(
+        { error: "Please accept and sign the damage responsibility waiver." },
         { status: 400 }
       );
     }
@@ -49,6 +58,10 @@ export async function POST(request: Request) {
         decorations: decorations || false,
         needHelpPlanning: needHelpPlanning || false,
         message: message || null,
+        waiverAccepted: true,
+        waiverSignature: String(waiverSignature).trim(),
+        waiverAcceptedAt: new Date(),
+        waiverTextVersion: "damage-responsibility-v1",
       },
     });
 

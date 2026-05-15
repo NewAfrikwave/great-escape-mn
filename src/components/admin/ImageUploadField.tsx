@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const MAX_UPLOAD_SIZE = 8 * 1024 * 1024;
+const TARGET_MAX_WIDTH = 1800;
+const TARGET_MAX_HEIGHT = 1200;
+
 interface ImageUploadFieldProps {
   id: string;
   label?: string;
@@ -15,6 +19,49 @@ interface ImageUploadFieldProps {
   required?: boolean;
   guide: string;
   previewHeight?: string;
+}
+
+async function resizeImageForUpload(file: File): Promise<File> {
+  if (file.size <= MAX_UPLOAD_SIZE && file.type === "image/png") return file;
+
+  const image = new Image();
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("Could not read image"));
+      image.src = objectUrl;
+    });
+
+    const scale = Math.min(
+      1,
+      TARGET_MAX_WIDTH / image.naturalWidth,
+      TARGET_MAX_HEIGHT / image.naturalHeight
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) return file;
+    context.drawImage(image, 0, 0, width, height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.88)
+    );
+    if (!blob) return file;
+
+    return new File(
+      [blob],
+      file.name.replace(/\.[^.]+$/, "") + ".jpg",
+      { type: "image/jpeg" }
+    );
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 export function ImageUploadField({
@@ -35,15 +82,17 @@ export function ImageUploadField({
       toast.error("Please upload a JPG or PNG image");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be 5MB or smaller");
+
+    const uploadFile = await resizeImageForUpload(file);
+    if (uploadFile.size > MAX_UPLOAD_SIZE) {
+      toast.error("Image is too large. Please choose a JPG or PNG under 8MB.");
       return;
     }
 
     setUploading(true);
     try {
       const body = new FormData();
-      body.append("file", file);
+      body.append("file", uploadFile);
       const res = await fetch("/api/admin/uploads", {
         method: "POST",
         body,
@@ -89,7 +138,7 @@ export function ImageUploadField({
             Upload JPG/PNG
           </Button>
           <p className="text-xs text-muted-foreground">
-            {guide} JPG or PNG, max 5MB.
+            {guide} JPG or PNG. Large photos are automatically resized before upload.
           </p>
         </div>
         <div className="mt-3">

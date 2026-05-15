@@ -70,6 +70,8 @@ export function BookingForm() {
     decorations: false,
     needHelpPlanning: false,
     message: "",
+    waiverAccepted: false,
+    waiverSignature: "",
   });
 
   useEffect(() => {
@@ -95,6 +97,10 @@ export function BookingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.waiverAccepted || !form.waiverSignature.trim()) {
+      alert("Please accept and sign the damage responsibility waiver.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -539,6 +545,52 @@ export function BookingForm() {
                     placeholder="Any special requests, questions, or notes for your experience..."
                     className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20 resize-none"
                   />
+                </div>
+
+                {/* Waiver */}
+                <div className="rounded-xl border border-[#c8993e]/25 bg-[#c8993e]/5 p-4 sm:p-5 space-y-4">
+                  <div>
+                    <Label className="text-base font-semibold text-[#1a2744]">
+                      Damage Responsibility Waiver *
+                    </Label>
+                    <p className="mt-2 text-sm leading-relaxed text-[#2a3d64]/70">
+                      I understand that I am responsible for any damage I or my
+                      guests cause to the boat, equipment, or property during
+                      the experience. I agree to follow captain instructions,
+                      lake rules, and safety requirements.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="waiverAccepted"
+                      checked={form.waiverAccepted}
+                      onCheckedChange={(checked) =>
+                        handleCheckbox("waiverAccepted", checked as boolean)
+                      }
+                      required
+                      className="mt-1 border-[#1a2744]/20 data-[state=checked]:bg-[#c8993e] data-[state=checked]:border-[#c8993e]"
+                    />
+                    <Label
+                      htmlFor="waiverAccepted"
+                      className="text-sm font-normal text-[#2a3d64]/75 cursor-pointer"
+                    >
+                      I have read and agree to the damage responsibility waiver.
+                    </Label>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="waiverSignature">
+                      Type your full name as your signature *
+                    </Label>
+                    <Input
+                      id="waiverSignature"
+                      name="waiverSignature"
+                      value={form.waiverSignature}
+                      onChange={handleChange}
+                      required
+                      placeholder="Full legal name"
+                      className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20"
+                    />
+                  </div>
                 </div>
 
                 {/* Payment info note */}

@@ -1,4 +1,5 @@
 import type { Booking } from "@prisma/client";
+import { getBookingCalendarUrl } from "@/lib/calendar";
 
 type ResendEmailPayload = {
   from: string;
@@ -33,6 +34,8 @@ const bookingRows = (booking: Booking) => [
   ["BYOB / cooler", formatBoolean(booking.byob)],
   ["Decorations", formatBoolean(booking.decorations)],
   ["Needs planning help", formatBoolean(booking.needHelpPlanning)],
+  ["Waiver signed", formatBoolean(booking.waiverAccepted)],
+  ["Waiver signature", booking.waiverSignature || "Not provided"],
   ["Message", booking.message || "Not provided"],
 ];
 
@@ -51,10 +54,13 @@ export async function sendBookingNotification(booking: Booking) {
     : "";
 
   const rows = bookingRows(booking);
+  const calendarUrl = getBookingCalendarUrl(booking);
   const text = [
     "New booking request",
     "",
     ...rows.map(([label, value]) => `${label}: ${value}`),
+    calendarUrl ? "" : undefined,
+    calendarUrl ? `Add to Google Calendar: ${calendarUrl}` : undefined,
     adminUrl ? "" : undefined,
     adminUrl ? `View in admin: ${adminUrl}` : undefined,
   ]
@@ -84,8 +90,13 @@ export async function sendBookingNotification(booking: Booking) {
           <tbody>${htmlRows}</tbody>
         </table>
         ${
+          calendarUrl
+            ? `<p style="margin:18px 0 0;"><a href="${escapeHtml(calendarUrl)}" style="color:#1d4ed8;">Add to Google Calendar</a></p>`
+            : ""
+        }
+        ${
           adminUrl
-            ? `<p style="margin:18px 0 0;"><a href="${escapeHtml(adminUrl)}" style="color:#1d4ed8;">View booking dashboard</a></p>`
+            ? `<p style="margin:8px 0 0;"><a href="${escapeHtml(adminUrl)}" style="color:#1d4ed8;">View booking dashboard</a></p>`
             : ""
         }
       </div>`,
