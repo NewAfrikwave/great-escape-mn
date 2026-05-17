@@ -43,7 +43,10 @@ const cardVariants = {
 
 export function FeaturedExperiences() {
   const { packages, loading } = usePackages();
-  const featured = packages.filter((p) => p.showOnHomepage);
+  const homepagePackages = packages.filter((p) => p.showOnHomepage);
+  const activePackages = packages.filter((p) => p.isActive);
+  const featured =
+    homepagePackages.length > 0 ? homepagePackages : activePackages;
 
   return (
     <section id="experiences" className="py-20 sm:py-28 bg-white">
@@ -75,7 +78,7 @@ export function FeaturedExperiences() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {(loading ? [] : featured).map((pkg) => {
+          {(loading ? [] : featured.slice(0, 6)).map((pkg) => {
             const Icon = iconMap[pkg.icon] || Compass;
 
             return (

@@ -46,7 +46,14 @@ const cardVariants = {
 
 export function PackageGrid() {
   const { packages, loading } = usePackages();
-  const visible = packages.filter((p) => p.showOnExperiencesPage);
+  const experiencesPagePackages = packages.filter(
+    (p) => p.showOnExperiencesPage
+  );
+  const activePackages = packages.filter((p) => p.isActive);
+  const visible =
+    experiencesPagePackages.length > 0
+      ? experiencesPagePackages
+      : activePackages;
 
   return (
     <section className="py-20 sm:py-28 bg-white">
