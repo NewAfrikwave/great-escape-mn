@@ -271,7 +271,7 @@ export default function AdminGalleryPage() {
             {images.length} {images.length === 1 ? "image" : "images"} total
           </p>
         </div>
-        <Button onClick={openAddDialog} className="gap-2 bg-[#1a2744] hover:bg-[#2a3d64]">
+        <Button onClick={openAddDialog} className="w-full gap-2 bg-[#1a2744] hover:bg-[#2a3d64] sm:w-auto">
           <Plus className="h-4 w-4" />
           Add Image
         </Button>
@@ -316,7 +316,7 @@ export default function AdminGalleryPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {filteredImages.map((img) => (
             <Card key={img.id} className="overflow-hidden group">
               {/* Image Thumbnail */}
@@ -354,12 +354,12 @@ export default function AdminGalleryPage() {
                 )}
 
                 {/* Action Buttons Overlay */}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => openEditDialog(img)}
-                    className="h-7 w-7 p-0"
+                    className="h-10 w-10 p-0 md:h-7 md:w-7"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                     <span className="sr-only">Edit</span>
@@ -368,7 +368,7 @@ export default function AdminGalleryPage() {
                     variant="secondary"
                     size="sm"
                     onClick={() => setDeleteConfirmId(img.id)}
-                    className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                    className="h-10 w-10 p-0 text-destructive hover:text-destructive md:h-7 md:w-7"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     <span className="sr-only">Delete</span>

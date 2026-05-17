@@ -46,6 +46,22 @@ const navItems = [
   { label: "Users", href: "/admin/users", icon: ShieldCheck },
 ];
 
+const mobilePrimaryItems = [
+  { label: "Home", href: "/admin", icon: LayoutDashboard },
+  { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+  { label: "Packages", href: "/admin/packages", icon: Package },
+  { label: "Gallery", href: "/admin/gallery", icon: Image },
+];
+
+function getCurrentTitle(pathname: string) {
+  const item = navItems.find(
+    (navItem) =>
+      pathname === navItem.href ||
+      (navItem.href !== "/admin" && pathname.startsWith(navItem.href))
+  );
+  return item?.label || "Admin";
+}
+
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -115,28 +131,76 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AdminSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const currentTitle = getCurrentTitle(pathname);
 
   return (
     <>
       <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-[#1a2744] border-r border-[#2a3d64] z-40">
         <SidebarContent />
       </aside>
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#1a2744] border-b border-[#2a3d64] h-14 flex items-center px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#1a2744] border-b border-[#2a3d64] h-16 flex items-center justify-between px-3">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 size-11">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-[#1a2744] border-[#2a3d64]">
+          <SheetContent side="left" className="w-[86vw] max-w-80 p-0 bg-[#1a2744] border-[#2a3d64]">
             <SidebarContent onNavigate={() => setMobileOpen(false)} />
           </SheetContent>
         </Sheet>
-        <div className="flex items-center gap-2 ml-3">
-          <Anchor className="h-5 w-5 text-[#c8993e]" />
-          <span className="font-bold text-white text-sm">Admin</span>
+        <div className="flex min-w-0 flex-1 items-center gap-2 px-2">
+          <Anchor className="h-5 w-5 text-[#c8993e] shrink-0" />
+          <div className="min-w-0">
+            <span className="block truncate text-sm font-bold leading-tight text-white">
+              {currentTitle}
+            </span>
+            <span className="block truncate text-[10px] leading-tight text-[#e8c878]">
+              A Great Escape
+            </span>
+          </div>
         </div>
+        <Link
+          href="/"
+          target="_blank"
+          className="rounded-md px-3 py-2 text-xs font-semibold text-white/80 hover:bg-white/10"
+        >
+          Site
+        </Link>
       </div>
+
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[#2a3d64] bg-[#1a2744] px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-1 shadow-[0_-10px_30px_rgba(0,0,0,0.18)]">
+        <div className="grid grid-cols-5 gap-1">
+          {mobilePrimaryItems.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/admin" && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex min-h-14 flex-col items-center justify-center rounded-lg px-1 text-[11px] font-medium transition-colors ${
+                  isActive
+                    ? "bg-[#c8993e] text-white"
+                    : "text-white/65 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <item.icon className="mb-0.5 h-5 w-5" />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="flex min-h-14 flex-col items-center justify-center rounded-lg px-1 text-[11px] font-medium text-white/65 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <Menu className="mb-0.5 h-5 w-5" />
+            <span>More</span>
+          </button>
+        </div>
+      </nav>
     </>
   );
 }

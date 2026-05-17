@@ -10,10 +10,10 @@ export default function AuthenticatedAdminLayout({
 }) {
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div data-admin-shell className="min-h-screen bg-gray-50">
         <AdminSidebar />
         <main className="lg:pl-64">
-          <div className="pt-14 lg:pt-0">
+          <div className="pt-16 pb-24 lg:pt-0 lg:pb-0">
             {children}
           </div>
         </main>

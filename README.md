@@ -77,7 +77,17 @@ After changes that include Prisma migrations, run:
 npm run db:migrate:deploy
 ```
 
-Admin image uploads accept JPG and PNG files. Large phone photos are resized in the browser before upload. Railway container storage is temporary across redeploys, so use the admin uploader for quick updates and connect persistent object storage later if you need uploads to survive every redeploy.
+Admin image uploads accept JPG and PNG files. Phone photos are resized in the browser before upload and saved with the CMS record in PostgreSQL, so image changes made from the admin phone UI survive Railway redeploys.
+
+## Phone Admin Workflow
+
+The admin panel is optimized for phone management:
+
+- A bottom navigation bar gives quick access to Dashboard, Bookings, Packages, Gallery, and More.
+- Booking requests render as tap-friendly cards on small screens.
+- Edit dialogs expand to a full-screen mobile editor with sticky save/cancel actions.
+- Gallery and package actions are visible on touch screens instead of hover-only.
+- Uploads accept phone camera photos, resize them automatically, and save them with the CMS data.
 
 ## App Commands
 

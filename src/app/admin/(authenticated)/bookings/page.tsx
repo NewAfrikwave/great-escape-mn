@@ -502,7 +502,55 @@ export default function BookingsPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <div className="space-y-3 p-3 md:hidden">
+              {filtered.map((booking) => (
+                <button
+                  key={booking.id}
+                  type="button"
+                  onClick={() => openDetail(booking)}
+                  className="admin-mobile-card w-full text-left transition active:scale-[0.99]"
+                >
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-semibold text-[#1a2744]">
+                        {booking.fullName}
+                      </p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {booking.phone}
+                      </p>
+                    </div>
+                    <StatusBadge status={booking.status} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="admin-mobile-kv">
+                      <p className="text-xs text-muted-foreground">Package</p>
+                      <p className="truncate font-medium">
+                        {slugToTitle(booking.packageSlug)}
+                      </p>
+                    </div>
+                    <div className="admin-mobile-kv">
+                      <p className="text-xs text-muted-foreground">Date</p>
+                      <p className="font-medium">{formatDate(booking.preferredDate)}</p>
+                    </div>
+                    <div className="admin-mobile-kv">
+                      <p className="text-xs text-muted-foreground">Lake</p>
+                      <p className="truncate font-medium">
+                        {booking.preferredLake ?? "Not set"}
+                      </p>
+                    </div>
+                    <div className="admin-mobile-kv">
+                      <p className="text-xs text-muted-foreground">Guests</p>
+                      <p className="font-medium">{booking.passengers ?? "Not set"}</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-[#c8993e]">
+                    Tap to view details, waiver, notes, and calendar
+                  </p>
+                </button>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
@@ -568,6 +616,7 @@ export default function BookingsPage() {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </CardContent>
       </Card>

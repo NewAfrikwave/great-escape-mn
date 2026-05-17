@@ -1,5 +1,3 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { verifyAdminAuth } from "@/lib/auth";
 
@@ -8,15 +6,6 @@ const ALLOWED_TYPES = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
 ]);
-
-function safeName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/\.[^.]+$/, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 60);
-}
 
 export async function POST(request: Request) {
   const session = await verifyAdminAuth(request);
@@ -49,17 +38,14 @@ export async function POST(request: Request) {
     }
 
     const bytes = Buffer.from(await upload.arrayBuffer());
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "admin");
-    await mkdir(uploadDir, { recursive: true });
-
-    const filename = `${Date.now()}-${safeName(upload.name) || "image"}.${extension}`;
-    await writeFile(path.join(uploadDir, filename), bytes);
+    const url = `data:${upload.type};base64,${bytes.toString("base64")}`;
 
     return NextResponse.json({
-      url: `/uploads/admin/${filename}`,
-      filename,
+      url,
+      filename: upload.name,
       size: upload.size,
       contentType: upload.type,
+      storage: "database",
     });
   } catch (error) {
     console.error("Admin image upload failed:", error);

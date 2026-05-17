@@ -355,7 +355,7 @@ export default function AdminPackagesPage() {
             {packages.length} {packages.length === 1 ? "package" : "packages"} total
           </p>
         </div>
-        <Button onClick={openAddDialog} className="gap-2">
+        <Button onClick={openAddDialog} className="w-full gap-2 sm:w-auto">
           <Plus className="h-4 w-4" />
           Add Package
         </Button>
@@ -437,8 +437,8 @@ export default function AdminPackagesPage() {
                     </div>
 
                     {/* Toggles & Actions */}
-                    <div className="flex items-center justify-between pt-1 border-t">
-                      <div className="flex items-center gap-4">
+                    <div className="flex flex-col gap-3 pt-1 border-t sm:flex-row sm:items-center sm:justify-between">
+                      <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-4">
                         <label className="flex items-center gap-1.5 text-xs cursor-pointer">
                           <Switch
                             checked={pkg.isActive}
@@ -458,24 +458,24 @@ export default function AdminPackagesPage() {
                           Featured
                         </label>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => openEditDialog(pkg)}
-                          className="h-8 w-8 p-0"
+                          className="h-11 w-full p-0 sm:h-8 sm:w-8"
                         >
                           <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
+                          <span className="sm:sr-only">Edit</span>
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setDeleteConfirmId(pkg.id)}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          className="h-11 w-full p-0 text-destructive hover:text-destructive sm:h-8 sm:w-8"
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
+                          <span className="sm:sr-only">Delete</span>
                         </Button>
                       </div>
                     </div>

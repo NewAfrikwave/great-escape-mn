@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const MAX_UPLOAD_SIZE = 8 * 1024 * 1024;
-const TARGET_MAX_WIDTH = 1800;
-const TARGET_MAX_HEIGHT = 1200;
+const TARGET_MAX_WIDTH = 1400;
+const TARGET_MAX_HEIGHT = 950;
 
 interface ImageUploadFieldProps {
   id: string;
@@ -50,7 +50,7 @@ async function resizeImageForUpload(file: File): Promise<File> {
     context.drawImage(image, 0, 0, width, height);
 
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, "image/jpeg", 0.88)
+      canvas.toBlob(resolve, "image/jpeg", 0.84)
     );
     if (!blob) return file;
 
@@ -100,7 +100,7 @@ export function ImageUploadField({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
       onChange(data.url);
-      toast.success("Image uploaded");
+      toast.success("Image uploaded and ready to save");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Upload failed");
     } finally {
@@ -138,7 +138,7 @@ export function ImageUploadField({
             Upload JPG/PNG
           </Button>
           <p className="text-xs text-muted-foreground">
-            {guide} JPG or PNG. Large photos are automatically resized before upload.
+            {guide} JPG or PNG. Phone photos are resized and saved with the CMS.
           </p>
         </div>
         <div className="mt-3">
@@ -146,7 +146,7 @@ export function ImageUploadField({
             id={id}
             value={value}
             onChange={(event) => onChange(event.target.value)}
-            placeholder="/uploads/admin/image.jpg or https://example.com/image.jpg"
+            placeholder="Upload an image or paste an image URL"
           />
         </div>
         {value ? (

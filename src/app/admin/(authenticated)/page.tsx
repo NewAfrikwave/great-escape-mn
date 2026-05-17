@@ -415,11 +415,11 @@ export default function AdminDashboardPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap">
             {quickActions.map((action) => (
               <Link key={action.href} href={action.href}>
                 <Button
-                  className={`${action.color} gap-2 text-sm font-medium shadow-sm transition-all hover:shadow-md`}
+                  className={`${action.color} w-full gap-2 text-sm font-medium shadow-sm transition-all hover:shadow-md lg:w-auto`}
                   size="sm"
                 >
                   <action.icon className="h-4 w-4" />
@@ -463,7 +463,41 @@ export default function AdminDashboardPage() {
                 <p className="text-sm">No booking requests yet</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="space-y-3 md:hidden">
+                {recentBookings.map((booking) => (
+                  <Link
+                    key={booking.id}
+                    href="/admin/bookings"
+                    className="admin-mobile-card block active:scale-[0.99]"
+                  >
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold" style={{ color: NAVY }}>
+                          {booking.fullName}
+                        </p>
+                        <p className="truncate text-sm text-gray-500">
+                          {booking.packageSlug ? booking.packageSlug.replace(/-/g, " ") : "No package"}
+                        </p>
+                      </div>
+                      <StatusBadge status={booking.status} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="admin-mobile-kv">
+                        <p className="text-xs text-gray-500">Lake</p>
+                        <p className="truncate font-medium">
+                          {booking.preferredLake || "Not set"}
+                        </p>
+                      </div>
+                      <div className="admin-mobile-kv">
+                        <p className="text-xs text-gray-500">Date</p>
+                        <p className="font-medium">{formatDate(booking.preferredDate)}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="hidden overflow-x-auto md:block">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -521,6 +555,7 @@ export default function AdminDashboardPage() {
                   </TableBody>
                 </Table>
               </div>
+              </>
             )}
           </CardContent>
         </Card>
