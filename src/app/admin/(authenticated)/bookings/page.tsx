@@ -383,14 +383,7 @@ export default function BookingsPage() {
   // ── Render ─────────────────────────────────────────────────────────────
 
   const selectedCalendarUrl = selectedBooking
-    ? getBookingCalendarUrl({
-        ...selectedBooking,
-        createdAt: new Date(selectedBooking.createdAt),
-        updatedAt: new Date(selectedBooking.updatedAt),
-        waiverAcceptedAt: selectedBooking.waiverAcceptedAt
-          ? new Date(selectedBooking.waiverAcceptedAt)
-          : null,
-      })
+    ? getBookingCalendarUrl(selectedBooking)
     : "";
 
   return (
@@ -745,6 +738,39 @@ export default function BookingsPage() {
                       </span>
                     </div>
                   </div>
+                  {selectedCalendarUrl ? (
+                    <div className="mt-3 rounded-xl border border-[#c8993e]/30 bg-[#c8993e]/10 p-3 sm:flex sm:items-center sm:justify-between sm:gap-3">
+                      <div className="mb-3 flex items-start gap-2 text-sm text-[#1a2744] sm:mb-0">
+                        <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-[#c8993e]" />
+                        <div>
+                          <p className="font-semibold">Calendar ready</p>
+                          <p className="text-muted-foreground">
+                            Add this booking to Google Calendar with the date,
+                            time, lake, and customer details filled in.
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        className="w-full bg-[#1a2744] text-white hover:bg-[#2a3d64] sm:w-auto"
+                        onClick={() =>
+                          window.open(
+                            selectedCalendarUrl,
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Add to Google Calendar
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                      Add a valid booking date to enable calendar sync.
+                    </div>
+                  )}
                 </section>
 
                 {/* Add-ons */}
