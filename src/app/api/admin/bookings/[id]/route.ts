@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyAdminAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { sendCustomerBookingConfirmed } from "@/lib/email";
 
 export async function GET(
   request: Request,
@@ -58,6 +59,14 @@ export async function PATCH(
       where: { id },
       data,
     });
+
+    if (existing.status !== "confirmed" && booking.status === "confirmed") {
+      try {
+        await sendCustomerBookingConfirmed(booking);
+      } catch (emailError) {
+        console.error("Booking confirmation email error:", emailError);
+      }
+    }
 
     return NextResponse.json(booking);
   } catch (error) {

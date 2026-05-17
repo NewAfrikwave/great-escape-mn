@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import {
   CalendarCheck,
+  AlertTriangle,
   Bell,
   CheckCircle2,
   CheckCheck,
@@ -30,7 +31,11 @@ import {
   Calendar,
   Anchor,
   MapPin,
+  FileSignature,
+  CreditCard,
+  Send,
 } from "lucide-react";
+import { toast } from "sonner";
 
 // Colors
 const NAVY = "#1a2744";
@@ -65,6 +70,9 @@ interface Booking {
   passengers: number | null;
   occasion: string | null;
   status: string;
+  waiverAccepted?: boolean;
+  quotedPrice?: number | null;
+  paymentStatus?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -73,6 +81,10 @@ interface DashboardData {
   stats: DashboardStats;
   recentBookings: Booking[];
   upcomingBookings: Booking[];
+  actionNeeded?: {
+    missingWaivers: Booking[];
+    unpaidBookings: Booking[];
+  };
 }
 
 // Status badge config
@@ -226,6 +238,14 @@ function formatDateTime(dateStr: string): string {
   }
 }
 
+function formatMoney(cents: number | null | undefined): string {
+  if (!cents) return "No price set";
+  return (cents / 100).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+}
+
 // Loading skeleton
 function DashboardSkeleton() {
   return (
@@ -288,6 +308,7 @@ export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sendingReminder, setSendingReminder] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchDashboard() {
@@ -347,6 +368,30 @@ export default function AdminDashboardPage() {
   if (!data) return null;
 
   const { stats, recentBookings, upcomingBookings } = data;
+  const missingWaivers = data.actionNeeded?.missingWaivers ?? [];
+  const unpaidBookings = data.actionNeeded?.unpaidBookings ?? [];
+  const actionCount = missingWaivers.length + unpaidBookings.length;
+
+  const sendReminder = async (bookingId: string, type: "waiver" | "payment") => {
+    const key = `${type}-${bookingId}`;
+    setSendingReminder(key);
+    try {
+      const res = await fetch(`/api/admin/bookings/${bookingId}/reminders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+
+      if (!res.ok) throw new Error();
+      toast.success(
+        type === "waiver" ? "Waiver reminder sent" : "Payment reminder sent"
+      );
+    } catch {
+      toast.error("Failed to send reminder");
+    } finally {
+      setSendingReminder(null);
+    }
+  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
@@ -362,6 +407,92 @@ export default function AdminDashboardPage() {
           Welcome back to A Great Escape admin panel
         </p>
       </div>
+
+      {/* Action Needed */}
+      <Card className={actionCount > 0 ? "border-amber-200 bg-amber-50/50" : ""}>
+        <CardHeader className="pb-3">
+          <CardTitle
+            className="flex items-center justify-between gap-3 text-base font-semibold"
+            style={{ color: NAVY }}
+          >
+            <span className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              Action Needed
+            </span>
+            <Badge
+              variant={actionCount > 0 ? "default" : "secondary"}
+              className={actionCount > 0 ? "bg-amber-600 text-white" : ""}
+            >
+              {actionCount}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {actionCount === 0 ? (
+            <div className="rounded-xl bg-white p-4 text-sm text-gray-500">
+              Nothing urgent right now. New requests, missing waivers, and unpaid
+              confirmed bookings will show here.
+            </div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              {missingWaivers.map((booking) => (
+                <div
+                  key={`waiver-${booking.id}`}
+                  className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm"
+                >
+                  <div className="mb-3 flex items-start gap-3">
+                    <FileSignature className="mt-1 h-5 w-5 text-amber-600" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold" style={{ color: NAVY }}>
+                        {booking.fullName}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Missing waiver • {formatDate(booking.preferredDate)}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="w-full bg-[#1a2744] text-white hover:bg-[#2a3d64]"
+                    disabled={sendingReminder === `waiver-${booking.id}`}
+                    onClick={() => sendReminder(booking.id, "waiver")}
+                  >
+                    <Send className="mr-2 h-4 w-4" />
+                    Send waiver reminder
+                  </Button>
+                </div>
+              ))}
+              {unpaidBookings.map((booking) => (
+                <div
+                  key={`payment-${booking.id}`}
+                  className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm"
+                >
+                  <div className="mb-3 flex items-start gap-3">
+                    <CreditCard className="mt-1 h-5 w-5 text-amber-600" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold" style={{ color: NAVY }}>
+                        {booking.fullName}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Payment due • {formatMoney(booking.quotedPrice)}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="w-full bg-[#1a2744] text-white hover:bg-[#2a3d64]"
+                    disabled={sendingReminder === `payment-${booking.id}`}
+                    onClick={() => sendReminder(booking.id, "payment")}
+                  >
+                    <Send className="mr-2 h-4 w-4" />
+                    Send payment reminder
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

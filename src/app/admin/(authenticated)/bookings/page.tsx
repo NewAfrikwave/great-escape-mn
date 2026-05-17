@@ -215,6 +215,7 @@ export default function BookingsPage() {
   // Payment info state
   const [editQuotedPrice, setEditQuotedPrice] = useState<string>("");
   const [savingPrice, setSavingPrice] = useState(false);
+  const [sendingReminder, setSendingReminder] = useState<string | null>(null);
 
   // ── Fetch ──────────────────────────────────────────────────────────────
 
@@ -344,8 +345,27 @@ export default function BookingsPage() {
 
   // ── Send payment link ──────────────────────────────────────────────────
 
-  const handleSendPaymentLink = () => {
-    toast.success("Payment link will be sent to customer email");
+  const handleSendReminder = async (type: "waiver" | "payment") => {
+    if (!selectedBooking) return;
+    setSendingReminder(type);
+    try {
+      const res = await fetch(
+        `/api/admin/bookings/${selectedBooking.id}/reminders`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type }),
+        }
+      );
+      if (!res.ok) throw new Error();
+      toast.success(
+        type === "waiver" ? "Waiver reminder sent" : "Payment reminder sent"
+      );
+    } catch {
+      toast.error("Failed to send reminder");
+    } finally {
+      setSendingReminder(null);
+    }
   };
 
   // ── Delete ─────────────────────────────────────────────────────────────
@@ -803,6 +823,23 @@ export default function BookingsPage() {
                     <p className="text-muted-foreground">
                       Signed: {formatDateTime(selectedBooking.waiverAcceptedAt)}
                     </p>
+                    {!selectedBooking.waiverAccepted && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 bg-[#1a2744] text-white hover:bg-[#2a3d64]"
+                        disabled={sendingReminder === "waiver"}
+                        onClick={() => handleSendReminder("waiver")}
+                      >
+                        {sendingReminder === "waiver" ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="mr-2 h-4 w-4" />
+                        )}
+                        Send Waiver Reminder
+                      </Button>
+                    )}
                   </div>
                 </section>
 
@@ -876,13 +913,18 @@ export default function BookingsPage() {
                     </div>
                     {selectedBooking.quotedPrice !== null && selectedBooking.quotedPrice > 0 && (
                       <Button
-                        onClick={handleSendPaymentLink}
+                        onClick={() => handleSendReminder("payment")}
                         size="sm"
                         variant="outline"
                         className="bg-[#1a2744] text-white hover:bg-[#2a3d64]"
+                        disabled={sendingReminder === "payment"}
                       >
-                        <Send className="h-4 w-4 mr-1" />
-                        Send Payment Link
+                        {sendingReminder === "payment" ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4 mr-1" />
+                        )}
+                        Send Payment Reminder
                       </Button>
                     )}
                   </div>

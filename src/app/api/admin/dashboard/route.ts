@@ -22,6 +22,8 @@ export async function GET(request: Request) {
       totalGalleryImages,
       totalTestimonials,
       unreadContactMessages,
+      missingWaiverBookings,
+      unpaidBookings,
     ] = await Promise.all([
       db.booking.count(),
       db.booking.count({ where: { status: "new" } }),
@@ -38,6 +40,23 @@ export async function GET(request: Request) {
       db.galleryImage.count({ where: { isActive: true } }),
       db.testimonial.count({ where: { isActive: true } }),
       db.contactMessage.count({ where: { read: false } }),
+      db.booking.findMany({
+        where: {
+          waiverAccepted: false,
+          status: { in: ["new", "contacted", "pending", "confirmed"] },
+        },
+        orderBy: [{ preferredDate: "asc" }, { createdAt: "desc" }],
+        take: 5,
+      }),
+      db.booking.findMany({
+        where: {
+          paymentStatus: "unpaid",
+          quotedPrice: { gt: 0 },
+          status: { in: ["pending", "confirmed"] },
+        },
+        orderBy: [{ preferredDate: "asc" }, { createdAt: "desc" }],
+        take: 5,
+      }),
     ]);
 
     // Get upcoming bookings (future preferred dates)
@@ -80,6 +99,10 @@ export async function GET(request: Request) {
       },
       recentBookings,
       upcomingBookings,
+      actionNeeded: {
+        missingWaivers: missingWaiverBookings,
+        unpaidBookings,
+      },
     });
   } catch (error) {
     console.error("Dashboard error:", error);

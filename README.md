@@ -32,11 +32,20 @@ Optional booking notification variables:
 RESEND_API_KEY=re_your_resend_api_key
 BOOKING_NOTIFICATION_EMAIL=admin@greatescapemn.com
 EMAIL_FROM="A Great Escape <bookings@yourdomain.com>"
+REMINDER_AUTOMATION_SECRET=replace-with-a-private-random-string
 ```
 
-If these are set, every public booking request is saved to the database and an email notification is sent to `BOOKING_NOTIFICATION_EMAIL`. If they are not set, bookings still appear in Admin > Bookings.
+If these are set, every public booking request is saved to the database, an email notification is sent to `BOOKING_NOTIFICATION_EMAIL`, and the customer receives an automatic request-received email. If they are not set, bookings still appear in Admin > Bookings.
 
-Booking notification emails include an "Add to Google Calendar" link when the customer provides a preferred date. Admins can also open a booking in Admin > Bookings and click "Add to Google Calendar".
+Booking emails include an `.ics` calendar attachment and an "Add to Google Calendar" link when the customer provides a preferred date/time. Admins can also open a booking in Admin > Bookings and click "Add to Google Calendar".
+
+Admin automation features:
+
+- New booking: sends admin alert and customer confirmation email.
+- Booking marked Confirmed: sends customer confirmation email with calendar attachment.
+- Dashboard > Action Needed: shows missing waivers and unpaid quoted bookings.
+- Admin can tap one button from Dashboard or Booking Details to send waiver or payment reminders.
+- Optional scheduled reminders: call `POST /api/automation/reminders` with header `Authorization: Bearer $REMINDER_AUTOMATION_SECRET`. It sends missing waiver and unpaid booking reminders, then records the send time to avoid repeat spam within 24 hours.
 
 Optional payment variables can be configured in the admin panel instead of environment variables:
 

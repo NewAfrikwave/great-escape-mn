@@ -254,10 +254,12 @@ model Booking {
   waiverSignature  String?
   waiverAcceptedAt DateTime?
   waiverTextVersion String?
+  waiverReminderSentAt DateTime?
   status           String   @default("new")
   adminNotes       String?
   quotedPrice      Int?     // Quoted price in cents (set by admin)
   paymentStatus    String   @default("unpaid") // unpaid, deposit_paid, paid, partially_refunded, refunded
+  paymentReminderSentAt DateTime?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

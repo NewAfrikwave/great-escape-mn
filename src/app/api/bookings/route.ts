@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { sendBookingNotification } from "@/lib/email";
+import {
+  sendBookingNotification,
+  sendCustomerBookingConfirmation,
+} from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -66,7 +69,10 @@ export async function POST(request: Request) {
     });
 
     try {
-      await sendBookingNotification(booking);
+      await Promise.all([
+        sendBookingNotification(booking),
+        sendCustomerBookingConfirmation(booking),
+      ]);
     } catch (notificationError) {
       console.error("Booking notification error:", notificationError);
     }

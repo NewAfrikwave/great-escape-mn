@@ -65,6 +65,59 @@ function formatGoogleDate(date: Date) {
   return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
+function escapeIcsText(value: string | null | undefined) {
+  return (value || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+function formatIcsDate(date: Date) {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}
+
+export function getBookingCalendarFile(booking: CalendarBooking) {
+  const start = parseBookingDate(booking);
+  if (!start) return null;
+
+  const end = addHours(start, 3);
+  const title = `A Great Escape booking - ${booking.fullName}`;
+  const description = [
+    `Customer: ${booking.fullName}`,
+    `Email: ${booking.email}`,
+    `Phone: ${booking.phone}`,
+    `Package: ${booking.packageSlug || "Custom cruise"}`,
+    `Passengers: ${booking.passengers || "Not provided"}`,
+    booking.message ? `Notes: ${booking.message}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//A Great Escape//Booking Calendar//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${escapeIcsText(`${booking.email}-${formatIcsDate(start)}@agreatescape`)}`,
+    `DTSTAMP:${formatIcsDate(new Date())}`,
+    `DTSTART:${formatIcsDate(start)}`,
+    `DTEND:${formatIcsDate(end)}`,
+    `SUMMARY:${escapeIcsText(title)}`,
+    `DESCRIPTION:${escapeIcsText(description)}`,
+    `LOCATION:${escapeIcsText(booking.preferredLake || "Minnesota lake")}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  return {
+    filename: `a-great-escape-${formatIcsDate(start).slice(0, 8)}.ics`,
+    content: Buffer.from(ics, "utf8").toString("base64"),
+  };
+}
+
 export function getBookingCalendarUrl(booking: CalendarBooking) {
   const start = parseBookingDate(booking);
   if (!start) return "";
