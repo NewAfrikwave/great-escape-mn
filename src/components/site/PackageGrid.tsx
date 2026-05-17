@@ -49,11 +49,10 @@ export function PackageGrid() {
   const experiencesPagePackages = packages.filter(
     (p) => p.showOnExperiencesPage
   );
-  const activePackages = packages.filter((p) => p.isActive);
   const visible =
     experiencesPagePackages.length > 0
       ? experiencesPagePackages
-      : activePackages;
+      : packages;
 
   return (
     <section className="py-20 sm:py-28 bg-white">

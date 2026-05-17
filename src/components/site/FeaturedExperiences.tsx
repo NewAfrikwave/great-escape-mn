@@ -44,9 +44,7 @@ const cardVariants = {
 export function FeaturedExperiences() {
   const { packages, loading } = usePackages();
   const homepagePackages = packages.filter((p) => p.showOnHomepage);
-  const activePackages = packages.filter((p) => p.isActive);
-  const featured =
-    homepagePackages.length > 0 ? homepagePackages : activePackages;
+  const featured = homepagePackages.length > 0 ? homepagePackages : packages;
 
   return (
     <section id="experiences" className="py-20 sm:py-28 bg-white">
