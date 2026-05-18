@@ -31,6 +31,7 @@ import {
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+  { label: "Users", href: "/admin/users", icon: ShieldCheck },
   { label: "Payments", href: "/admin/payments", icon: CreditCard },
   { label: "Payment Settings", href: "/admin/payment-settings", icon: CreditCard },
   { label: "Packages", href: "/admin/packages", icon: Package },
@@ -43,14 +44,13 @@ const navItems = [
   { label: "Lakes", href: "/admin/lakes", icon: MapPin },
   { label: "SEO", href: "/admin/seo", icon: Search },
   { label: "Settings", href: "/admin/settings", icon: Settings },
-  { label: "Users", href: "/admin/users", icon: ShieldCheck },
 ];
 
 const mobilePrimaryItems = [
   { label: "Home", href: "/admin", icon: LayoutDashboard },
   { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
   { label: "Packages", href: "/admin/packages", icon: Package },
-  { label: "Gallery", href: "/admin/gallery", icon: Image },
+  { label: "Users", href: "/admin/users", icon: ShieldCheck },
 ];
 
 function getCurrentTitle(pathname: string) {
@@ -73,7 +73,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="p-4 border-b border-[#2a3d64]">
         <Link href="/admin" onClick={onNavigate} className="flex items-center gap-2">
           <Anchor className="h-7 w-7 text-[#c8993e]" />
@@ -84,7 +84,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </Link>
       </div>
 
-      <ScrollArea className="flex-1 py-3">
+      <ScrollArea className="min-h-0 flex-1 py-3">
         <nav className="px-3 space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
