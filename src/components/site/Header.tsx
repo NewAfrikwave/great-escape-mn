@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Anchor, X } from "lucide-react";
+import { Menu, Anchor, X, Facebook, Instagram } from "lucide-react";
+import { useBusinessInfo } from "@/hooks/use-site-data";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -18,6 +19,19 @@ const navLinks = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { info } = useBusinessInfo();
+  const socialLinks = [
+    info?.facebookUrl
+      ? { label: "Facebook", href: info.facebookUrl, icon: Facebook }
+      : null,
+    info?.instagramUrl
+      ? { label: "Instagram", href: info.instagramUrl, icon: Instagram }
+      : null,
+  ].filter(Boolean) as {
+    label: string;
+    href: string;
+    icon: typeof Facebook;
+  }[];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -131,6 +145,27 @@ export function Header() {
                       </Button>
                     </Link>
                   </div>
+                  {socialLinks.length > 0 && (
+                    <div className="mt-4 border-t border-[#2a3d64] pt-4">
+                      <p className="mb-3 px-4 text-xs font-semibold uppercase tracking-wider text-white/40">
+                        Follow
+                      </p>
+                      <div className="flex items-center gap-3 px-4">
+                        {socialLinks.map((social) => (
+                          <a
+                            key={social.href}
+                            href={social.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Visit A Great Escape on ${social.label}`}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/75 transition-colors hover:border-[#c8993e] hover:bg-[#c8993e] hover:text-white"
+                          >
+                            <social.icon className="h-5 w-5" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>

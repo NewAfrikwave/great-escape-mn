@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Anchor } from "lucide-react";
+import { Anchor, Facebook, Instagram } from "lucide-react";
 import { useLakes, useBusinessInfo } from "@/hooks/use-site-data";
 
 const quickLinks = [
@@ -25,6 +25,18 @@ export function Footer() {
   const serviceArea = info?.serviceAreaDescription || "Minnesota lakes including Prior Lake, Marion Lake, Lakeville, Lake Minnetonka, and nearby areas by request.";
   const footerDesc = info?.footerDescription || "Private captain-led pontoon experiences on Minnesota's most beautiful lakes.";
   const copyright = info?.copyrightText || "A Great Escape. All rights reserved.";
+  const socialLinks = [
+    info?.facebookUrl
+      ? { label: "Facebook", href: info.facebookUrl, icon: Facebook }
+      : null,
+    info?.instagramUrl
+      ? { label: "Instagram", href: info.instagramUrl, icon: Instagram }
+      : null,
+  ].filter(Boolean) as {
+    label: string;
+    href: string;
+    icon: typeof Facebook;
+  }[];
 
   return (
     <footer className="bg-[#0f1a2e] text-white relative">
@@ -117,6 +129,27 @@ export function Footer() {
                 </span>
               </li>
             </ul>
+            {socialLinks.length > 0 && (
+              <div className="mt-5">
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+                  Follow
+                </h4>
+                <div className="flex items-center gap-3">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.href}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Visit A Great Escape on ${social.label}`}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition-colors hover:border-[#c8993e] hover:bg-[#c8993e] hover:text-white"
+                    >
+                      <social.icon className="h-5 w-5" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
