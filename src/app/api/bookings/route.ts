@@ -37,10 +37,32 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!preferredDate) {
+      return NextResponse.json(
+        { error: "Please choose an available date." },
+        { status: 400 }
+      );
+    }
+
     if (!waiverAccepted || !String(waiverSignature || "").trim()) {
       return NextResponse.json(
         { error: "Please accept and sign the damage responsibility waiver." },
         { status: 400 }
+      );
+    }
+
+    const heldBooking = await db.booking.findFirst({
+      where: {
+        preferredDate,
+        status: { in: ["pending", "confirmed", "completed"] },
+      },
+      select: { id: true },
+    });
+
+    if (heldBooking) {
+      return NextResponse.json(
+        { error: "That date is already booked. Please choose another available date." },
+        { status: 409 }
       );
     }
 

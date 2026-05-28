@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Select,
   SelectContent,
@@ -30,6 +31,7 @@ import {
   CreditCard,
   Shield,
   Info,
+  CalendarDays,
 } from "lucide-react";
 import { usePackages, usePaymentSettings } from "@/hooks/use-site-data";
 import { useLakes } from "@/hooks/use-site-data";
@@ -45,6 +47,30 @@ const occasions = [
   "Other",
 ];
 
+function toDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function fromDateKey(value: string) {
+  if (!value) return undefined;
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatDisplayDate(value: string) {
+  const date = fromDateKey(value);
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export function BookingForm() {
   const searchParams = useSearchParams();
   const { packages, loading: packagesLoading } = usePackages();
@@ -54,6 +80,8 @@ export function BookingForm() {
   const [loading, setLoading] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [paying, setPaying] = useState<"stripe" | "paypal" | null>(null);
+  const [availabilityLoading, setAvailabilityLoading] = useState(true);
+  const [unavailableDates, setUnavailableDates] = useState<string[]>([]);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -85,6 +113,27 @@ export function BookingForm() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/public/availability")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { unavailableDates?: string[] } | null) => {
+        if (cancelled) return;
+        setUnavailableDates(data?.unavailableDates || []);
+      })
+      .catch(() => {
+        if (!cancelled) setUnavailableDates([]);
+      })
+      .finally(() => {
+        if (!cancelled) setAvailabilityLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -99,6 +148,10 @@ export function BookingForm() {
     e.preventDefault();
     if (!form.waiverAccepted || !form.waiverSignature.trim()) {
       alert("Please accept and sign the damage responsibility waiver.");
+      return;
+    }
+    if (!form.preferredDate) {
+      alert("Please choose an available date from the calendar.");
       return;
     }
     setLoading(true);
@@ -117,6 +170,9 @@ export function BookingForm() {
         const data = await res.json();
         setBookingId(data.bookingId || data.id || null);
         setSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "That date is not available. Please choose another date.");
       }
     } catch {
       // Silently handle error
@@ -164,6 +220,12 @@ export function BookingForm() {
   const hasPaymentEnabled = paymentSettings?.stripeEnabled || paymentSettings?.paypalEnabled;
   const activePackages = packages.filter((pkg) => pkg.isActive);
   const activeLakes = lakes.filter((lake) => lake.isActive);
+  const unavailableDateSet = new Set(unavailableDates);
+  const selectedDate = form.preferredDate
+    ? fromDateKey(form.preferredDate)
+    : undefined;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   if (submitted) {
     return (
@@ -432,19 +494,72 @@ export function BookingForm() {
                 </div>
 
                 {/* Date & Time */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="preferredDate">Preferred Date</Label>
-                    <Input
-                      id="preferredDate"
-                      name="preferredDate"
-                      type="date"
-                      value={form.preferredDate}
-                      onChange={handleChange}
-                      className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20"
-                    />
+                <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="flex items-center gap-2 text-base font-semibold text-[#1a2744]">
+                        <CalendarDays className="h-4 w-4 text-[#c8993e]" />
+                        Choose an Available Date *
+                      </Label>
+                      <p className="mt-1 text-sm text-[#2a3d64]/60">
+                        Dates already booked are grayed out and cannot be selected.
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-[#1a2744]/10 bg-white p-2 shadow-sm">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        disabled={(date) => {
+                          const normalized = new Date(date);
+                          normalized.setHours(0, 0, 0, 0);
+                          return (
+                            normalized < today ||
+                            unavailableDateSet.has(toDateKey(normalized))
+                          );
+                        }}
+                        onSelect={(date) => {
+                          if (!date) return;
+                          setForm((prev) => ({
+                            ...prev,
+                            preferredDate: toDateKey(date),
+                          }));
+                        }}
+                        className="mx-auto w-full"
+                        classNames={{
+                          root: "w-full",
+                          month: "w-full",
+                          table: "w-full border-collapse",
+                          day: "relative w-full h-full p-0 text-center aspect-square select-none",
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-[#2a3d64]/60">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="h-3 w-3 rounded-full bg-[#1a2744]" />
+                        Selected
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="h-3 w-3 rounded-full border border-[#1a2744]/20 bg-white" />
+                        Available
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="h-3 w-3 rounded-full bg-gray-200" />
+                        Booked / unavailable
+                      </span>
+                    </div>
+                    {availabilityLoading && (
+                      <p className="text-sm text-[#2a3d64]/50">
+                        Loading latest availability...
+                      </p>
+                    )}
+                    {form.preferredDate && (
+                      <p className="rounded-xl bg-[#2d5a3d]/10 px-4 py-3 text-sm font-medium text-[#2d5a3d]">
+                        Selected date: {formatDisplayDate(form.preferredDate)}
+                      </p>
+                    )}
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
                     <Label htmlFor="preferredTime">Preferred Time</Label>
                     <Input
                       id="preferredTime"
@@ -454,8 +569,8 @@ export function BookingForm() {
                       onChange={handleChange}
                       className="border-[#1a2744]/10 focus:border-[#c8993e] focus:ring-[#c8993e]/20"
                     />
-                  </div>
-                  <div className="space-y-2">
+                    </div>
+                    <div className="space-y-2">
                     <Label>Special Occasion?</Label>
                     <Select
                       value={form.occasion}
@@ -474,6 +589,12 @@ export function BookingForm() {
                         ))}
                       </SelectContent>
                     </Select>
+                    </div>
+                    <div className="rounded-xl border border-[#c8993e]/25 bg-[#c8993e]/5 p-4 text-sm text-[#2a3d64]/70">
+                      Your date is a request until A Great Escape confirms the
+                      booking. Confirmed and pending bookings are automatically
+                      removed from availability.
+                    </div>
                   </div>
                 </div>
 
